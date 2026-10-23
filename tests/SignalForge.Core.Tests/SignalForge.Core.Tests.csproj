@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <None Update="Fixtures\Terminal2\Default.profile" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\docs\evidence\modbus-register-read.scenario.json" Link="Fixtures\modbus-register-read.scenario.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

@@ -57,6 +57,12 @@ public partial class ProtocolTestingViewModel : ViewModelBase
     private string _reportPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "signalforge-protocol-test-report.json");
 
     [ObservableProperty]
+    private string _scenarioPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "SignalForge", "Scenarios", "modbus-register-read.json");
+
+    [ObservableProperty]
+    private string _scenarioStatus = "Save the editable test sequence as a reusable JSON scenario.";
+
+    [ObservableProperty]
     private string _reportStatus = "Complete a run to enable its self-contained JSON report.";
 
     [ObservableProperty]
@@ -125,6 +131,8 @@ public partial class ProtocolTestingViewModel : ViewModelBase
     public bool CanCancelTest => IsRunning && _runCancellation is not null;
     public bool CanExportReport => !IsRunning && _lastScenario is not null && _lastResult is not null && !string.IsNullOrWhiteSpace(ReportPath);
     public bool CanEdit => !IsRunning;
+    public bool CanSaveScenario => !IsRunning && Steps.Count > 0 && !string.IsNullOrWhiteSpace(ScenarioPath);
+    public bool CanLoadScenario => !IsRunning && !string.IsNullOrWhiteSpace(ScenarioPath);
     public bool CanRemoveSelectedStep => !IsRunning && SelectedStep is not null;
     public bool CanOpenSelectedTraceEvent => SelectedEvidenceRow?.TraceSequence is not null;
     public string StatusLabel => RunState switch
@@ -168,6 +176,8 @@ public partial class ProtocolTestingViewModel : ViewModelBase
     partial void OnReplaySpeedChanged(string value) => RunTestCommand.NotifyCanExecuteChanged();
 
     partial void OnReportPathChanged(string value) => ExportReportCommand.NotifyCanExecuteChanged();
+
+    partial void OnScenarioPathChanged(string value) => NotifyScenarioCommands();
 
     partial void OnRunStateChanged(string value)
     {
@@ -298,6 +308,56 @@ public partial class ProtocolTestingViewModel : ViewModelBase
             TimeoutMs = "1000"
         });
         NotifyCommandStates();
+    }
+
+    [RelayCommand(CanExecute = nameof(CanSaveScenario))]
+    private async Task SaveScenarioAsync()
+    {
+        try
+        {
+            ValidateScenarioSourceOptions(SelectedSource, SelectedSimulatorFaultPlan, ReplaySpeed);
+            var scenario = BuildScenario();
+            var document = new ProtocolTestScenarioFile(
+                ProtocolTestScenarioFileSerializer.CurrentSchemaVersion,
+                DateTimeOffset.UtcNow,
+                SelectedSource,
+                SelectedSimulatorFaultPlan,
+                ReplaySpeed,
+                ProtocolTestScenarioFileSerializer.ToConfiguration(scenario));
+            var path = await ProtocolTestScenarioFileSerializer.WriteAsync(ScenarioPath, document);
+            ScenarioStatus = $"Saved reusable scenario: {path}";
+        }
+        catch (Exception exception)
+        {
+            ScenarioStatus = $"Scenario save failed: {exception.Message}";
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanLoadScenario))]
+    private async Task LoadScenarioAsync()
+    {
+        try
+        {
+            var document = await ProtocolTestScenarioFileSerializer.ReadAsync(ScenarioPath);
+            var loadedScenario = ProtocolTestScenarioFileSerializer.ToScenario(document.Scenario);
+            ValidateScenarioSourceOptions(document.Source, document.SimulatorFaultPlan, document.ReplaySpeed);
+
+            if (document.Source == ReplaySource && !Sources.Contains(ReplaySource))
+                Sources.Add(ReplaySource);
+            SelectedSource = document.Source;
+            SelectedSimulatorFaultPlan = document.SimulatorFaultPlan;
+            ReplaySpeed = document.ReplaySpeed;
+            Steps.Clear();
+            foreach (var step in loadedScenario.Steps)
+                Steps.Add(CreateEditor(step));
+            SelectedStep = Steps.FirstOrDefault();
+            ScenarioStatus = $"Loaded {loadedScenario.Steps.Count} test steps from {Path.GetFullPath(ScenarioPath)}.";
+            NotifyCommandStates();
+        }
+        catch (Exception exception)
+        {
+            ScenarioStatus = $"Scenario load failed: {exception.Message}";
+        }
     }
 
     [RelayCommand]
@@ -667,6 +727,64 @@ public partial class ProtocolTestingViewModel : ViewModelBase
         OnPropertyChanged(nameof(CanExportReport));
         OnPropertyChanged(nameof(CanRemoveSelectedStep));
         OnPropertyChanged(nameof(CanEdit));
+        NotifyScenarioCommands();
+    }
+
+    private void NotifyScenarioCommands()
+    {
+        SaveScenarioCommand.NotifyCanExecuteChanged();
+        LoadScenarioCommand.NotifyCanExecuteChanged();
+        OnPropertyChanged(nameof(CanSaveScenario));
+        OnPropertyChanged(nameof(CanLoadScenario));
+    }
+
+    private void ValidateScenarioSourceOptions(string source, string faultPlan, string replaySpeed)
+    {
+        if (source is not (SimulatorSource or Terminal2SimulatorSource or ReplaySource))
+            throw new InvalidDataException($"Unsupported scenario source '{source}'.");
+        if (!SimulatorFaultPlans.Contains(faultPlan))
+            throw new InvalidDataException($"Unsupported simulator fault plan '{faultPlan}'.");
+        if (source == Terminal2SimulatorSource && faultPlan is not ("None" or "Corrupt Terminal2 LRC on response 1"))
+            throw new InvalidDataException("The selected fault plan does not apply to the Terminal2 simulator.");
+        if (source == SimulatorSource && faultPlan == "Corrupt Terminal2 LRC on response 1")
+            throw new InvalidDataException("The Terminal2 LRC fault plan requires the Terminal2 simulator.");
+        if (source == ReplaySource && faultPlan != "None")
+            throw new InvalidDataException("Offline replay scenarios cannot include simulator fault injection.");
+        if (source == ReplaySource
+            && (!double.TryParse(replaySpeed, NumberStyles.Float, CultureInfo.InvariantCulture, out var speed)
+                || double.IsNaN(speed) || double.IsInfinity(speed) || speed <= 0))
+            throw new InvalidDataException("Replay speed must be a finite number greater than zero.");
+    }
+
+    private static ProtocolTestStepEditor CreateEditor(ProtocolTestStep step)
+    {
+        var editor = step switch
+        {
+            SendBytesStep send => new ProtocolTestStepEditor("Send bytes", send.Name)
+            {
+                HexBytes = FormatHex(send.Bytes.Span)
+            },
+            ExpectBytesStep expect => new ProtocolTestStepEditor("Expect bytes", expect.Name)
+            {
+                HexBytes = FormatHex(expect.Expected.Span),
+                MaskHex = expect.Mask.IsEmpty ? string.Empty : FormatHex(expect.Mask.Span),
+                TimeoutMs = ((int)expect.Timeout.TotalMilliseconds).ToString(CultureInfo.InvariantCulture)
+            },
+            ExpectModbusTcpStep expect => new ProtocolTestStepEditor("Assert Modbus TCP", expect.Name)
+            {
+                TransactionId = expect.TransactionId?.ToString(CultureInfo.InvariantCulture) ?? string.Empty,
+                UnitId = expect.UnitId?.ToString(CultureInfo.InvariantCulture) ?? string.Empty,
+                FunctionCode = expect.FunctionCode?.ToString(CultureInfo.InvariantCulture) ?? string.Empty,
+                ExceptionCode = expect.ExceptionCode?.ToString(CultureInfo.InvariantCulture) ?? string.Empty,
+                TimeoutMs = ((int)expect.Timeout.TotalMilliseconds).ToString(CultureInfo.InvariantCulture)
+            },
+            DelayTestStep delay => new ProtocolTestStepEditor("Delay", delay.Name)
+            {
+                DelayMs = ((int)delay.Duration.TotalMilliseconds).ToString(CultureInfo.InvariantCulture)
+            },
+            _ => throw new InvalidDataException($"Unsupported test step type {step.GetType().Name}.")
+        };
+        return editor;
     }
 
     private static TimeSpan ParseTimeout(string text)

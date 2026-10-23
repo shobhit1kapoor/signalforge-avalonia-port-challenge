@@ -124,7 +124,7 @@ public static class ProtocolTestReportFactory
             ? null
             : Math.Max(0, Stopwatch.GetElapsedTime(result.StartedAtTicks, ticks).TotalMilliseconds);
 
-        var configuredSteps = scenario.Steps.Select((step, index) => ToConfiguration(index + 1, step)).ToArray();
+        var configuredSteps = ProtocolTestScenarioFileSerializer.ToConfiguration(scenario).Steps;
         var stepResults = result.Steps.Select(step => new ProtocolTestReportStepResult(
             step.StepNumber,
             step.Name,
@@ -173,22 +173,6 @@ public static class ProtocolTestReportFactory
             sourceConfiguration);
     }
 
-    private static ProtocolTestStepConfiguration ToConfiguration(int number, ProtocolTestStep step) => step switch
-    {
-        SendBytesStep send => new(number, "sendBytes", send.Name, BytesBase64: Convert.ToBase64String(send.Bytes.ToArray())),
-        ExpectBytesStep expect => new(number, "expectBytes", expect.Name,
-            expect.Timeout.TotalMilliseconds,
-            ExpectedBytesBase64: Convert.ToBase64String(expect.Expected.ToArray()),
-            MaskBase64: Convert.ToBase64String(expect.Mask.ToArray())),
-        ExpectModbusTcpStep expect => new(number, "expectModbusTcp", expect.Name,
-            expect.Timeout.TotalMilliseconds,
-            TransactionId: expect.TransactionId,
-            UnitId: expect.UnitId,
-            FunctionCode: expect.FunctionCode,
-            ExceptionCode: expect.ExceptionCode),
-        DelayTestStep delay => new(number, "delay", delay.Name, DelayMilliseconds: delay.Duration.TotalMilliseconds),
-        _ => throw new NotSupportedException($"Cannot export unsupported test step type {step.GetType().Name}.")
-    };
 }
 
 /// <summary>Writes reports using a same-directory temporary file and atomic replacement.</summary>

@@ -7,6 +7,48 @@ namespace SignalForge.Core.Tests.Desktop;
 public sealed class ProtocolTestingViewModelTests
 {
     [Fact]
+    public async Task Scenario_controls_save_and_restore_the_editable_test_sequence()
+    {
+        var viewModel = new ProtocolTestingViewModel(dispatchToUi: action => action());
+        var folder = Path.Combine(Path.GetTempPath(), $"signalforge-scenario-ui-{Guid.NewGuid():N}");
+        viewModel.ScenarioPath = Path.Combine(folder, "scenario.json");
+        viewModel.SelectedSimulatorFaultPlan = "Corrupt Modbus function code on response 1";
+
+        try
+        {
+            await viewModel.SaveScenarioCommand.ExecuteAsync(null);
+            Assert.Contains("Saved reusable scenario", viewModel.ScenarioStatus, StringComparison.Ordinal);
+
+            viewModel.LoadStxEtxLrcExampleCommand.Execute(null);
+            Assert.Equal(2, viewModel.Steps.Count);
+            await viewModel.LoadScenarioCommand.ExecuteAsync(null);
+
+            Assert.Equal(ProtocolTestingViewModel.SimulatorSource, viewModel.SelectedSource);
+            Assert.Equal("Corrupt Modbus function code on response 1", viewModel.SelectedSimulatorFaultPlan);
+            Assert.Equal(2, viewModel.Steps.Count);
+            Assert.Equal("Read registers 0–1", viewModel.Steps[0].Name);
+            Assert.Equal("00 01 00 00 00 06 01 03 00 00 00 02", viewModel.Steps[0].HexBytes);
+            Assert.Equal("Check response", viewModel.Steps[1].Name);
+            Assert.Equal("3", viewModel.Steps[1].FunctionCode);
+            Assert.Contains("Loaded 2 test steps", viewModel.ScenarioStatus, StringComparison.Ordinal);
+
+            var invalid = (await File.ReadAllTextAsync(viewModel.ScenarioPath)).Replace("\"schemaVersion\": 1", "\"schemaVersion\": 99", StringComparison.Ordinal);
+            await File.WriteAllTextAsync(viewModel.ScenarioPath, invalid);
+            viewModel.LoadStxEtxLrcExampleCommand.Execute(null);
+            await viewModel.LoadScenarioCommand.ExecuteAsync(null);
+
+            Assert.Equal(ProtocolTestingViewModel.Terminal2SimulatorSource, viewModel.SelectedSource);
+            Assert.Equal("Send Terminal2 STX/ETX frame", viewModel.Steps[0].Name);
+            Assert.Contains("Unsupported scenario schema version 99", viewModel.ScenarioStatus, StringComparison.Ordinal);
+        }
+        finally
+        {
+            if (Directory.Exists(folder))
+                Directory.Delete(folder, recursive: true);
+        }
+    }
+
+    [Fact]
     public async Task Local_simulator_test_shows_pass_then_explains_corrupted_function_code()
     {
         var viewModel = new ProtocolTestingViewModel();

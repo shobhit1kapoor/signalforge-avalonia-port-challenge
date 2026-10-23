@@ -60,6 +60,14 @@
                             <Button Classes="tool" Content="LOAD READ EXAMPLE" Command="{Binding LoadReadExampleCommand}" IsEnabled="{Binding CanEdit}" />
                             <Button Classes="tool" Content="LOAD STX/LRC EXAMPLE" Command="{Binding LoadStxEtxLrcExampleCommand}" IsEnabled="{Binding CanEdit}" />
                         </WrapPanel>
+                        <Border Background="#0E131A" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="4" Padding="6">
+                            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6">
+                                <TextBox Text="{Binding ScenarioPath}" MinHeight="27" IsEnabled="{Binding CanEdit}" PlaceholderText="Reusable scenario JSON path" ToolTip.Tip="Path for the editable, reusable protocol-test scenario." />
+                                <Button Grid.Column="1" Classes="tool" Content="SAVE SCENARIO" Command="{Binding SaveScenarioCommand}" IsEnabled="{Binding CanSaveScenario}" />
+                                <Button Grid.Column="2" Classes="tool" Content="LOAD SCENARIO" Command="{Binding LoadScenarioCommand}" IsEnabled="{Binding CanLoadScenario}" />
+                            </Grid>
+                        </Border>
+                        <TextBlock Text="{Binding ScenarioStatus}" FontSize="7" TextWrapping="Wrap" />
                     </StackPanel>
                     <Border Grid.Row="1" Background="#0E131A" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1" Padding="8,5">
                         <TextBlock Text="Edit hex as byte pairs. Receive steps use bounded timeouts; blank Modbus fields are wildcards. STX/LRC example checks frame bytes and validates LRC." FontSize="8" TextWrapping="Wrap" />

@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "savedAtUtc": "2026-10-23T22:30:00+00:00",
+  "source": "Local Modbus simulator · loopback only",
+  "simulatorFaultPlan": "None",
+  "replaySpeed": "1.0",
+  "scenario": {
+    "name": "Protocol test",
+    "disconnectWhenDone": true,
+    "steps": [
+      {
+        "number": 1,
+        "kind": "sendBytes",
+        "name": "Read registers 0–1",
+        "bytesBase64": "AAEAAAAGAQMAAAAC"
+      },
+      {
+        "number": 2,
+        "kind": "expectModbusTcp",
+        "name": "Check response",
+        "timeoutMilliseconds": 1000,
+        "transactionId": 1,
+        "unitId": 1,
+        "functionCode": 3
+      }
+    ]
+  }
+}
