@@ -34,10 +34,10 @@ The practical lesson for SIGNALFORGE is to demonstrate a few real end-to-end wor
 | Requirement | Evidence | Release status |
 |---|---|---|
 | Existing source application | Terminal2 v1.6.1.4 is pinned at `d3adbd301963b729885cc41fb75b3a80bcdf5472`; source audit is in `MIGRATION.md`. | Eligible as a port of a pre-existing application; attribution and license identity are retained. |
-| Compatible open-source license | The project uses GPL-3.0-or-later, compatible with the Terminal2 migration. | Public repository creation and push are in progress. |
-| Downloadable builds | Local Windows x64 and Linux x64 archives passed 12-second startup smoke checks (Linux under Ubuntu WSL2). The CI workflow builds, launches and packages all three targets on hosted platform runners, then attaches them to a tagged release. | Await the hosted platform matrix and tagged release before claiming downloadable builds are verified. |
+| Compatible open-source license | The project uses GPL-3.0-or-later, compatible with the Terminal2 migration. The [public repository](https://github.com/shobhit1kapoor/signalforge-avalonia-port-challenge) is live. | License and source are public. |
+| Downloadable builds | Local Windows x64 and Linux x64 archives passed 12-second startup smoke checks. The [hosted matrix](https://github.com/shobhit1kapoor/signalforge-avalonia-port-challenge/actions/runs/40028123099) passed on Windows x64, Linux x64, and native macOS ARM64; each job ran the test split, published, smoke-launched and packaged its target. | Versioned releases publish the three platform assets and checksum manifest. |
 | Before/after screenshots | The README includes genuine Terminal2 and SIGNALFORGE desktop captures; their recorded sizes are 1936×1096 and 1920×1080. The matching screenshots are not identical in resolution. Simulator activity is labeled as simulated. | Included in the public README. |
 | Migration write-up | The README summarizes the framework and transport changes, compatibility work, a concrete test finding, untracked engineering time, and known gaps. `MIGRATION.md` and `PARITY.md` hold the detailed audit. | Included in the public README. |
-| Entry form | The official form has not been submitted. | Submit after the public repository and release URL are available; confirm any personal contact fields. |
+| Entry form | The official form has not been submitted. | Submit the official form after confirming the entrant's name and email. |
 
-The contest closes at **23:59 UTC on October 23, 2026**. Local Windows and WSL2 results do not stand in for native hosted macOS, Linux, or Windows checks; wait for the platform workflow before stating those checks passed.
+The contest closes at **23:59 UTC on October 23, 2026**. The hosted matrix provides native Windows, Linux, and macOS build-and-launch evidence; physical serial hardware is still unverified.
