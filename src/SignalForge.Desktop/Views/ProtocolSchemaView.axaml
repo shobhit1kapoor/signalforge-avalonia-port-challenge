@@ -1,0 +1,77 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:SignalForge.Desktop.ViewModels"
+             x:Class="SignalForge.Desktop.Views.ProtocolSchemaView"
+             x:DataType="vm:ProtocolSchemaViewModel">
+    <Grid RowDefinitions="Auto,*,Auto" Margin="12" RowSpacing="8" Background="{StaticResource CanvasBrush}">
+        <Border Background="#0E131A" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1" Padding="12,9">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                <StackPanel Spacing="3">
+                    <TextBlock Text="USER PROTOCOL SCHEMA STUDIO" Classes="eyebrow" Foreground="{StaticResource AccentBrush}" />
+                    <TextBlock Text="Define packet length, signature, typed fields and optional checksums; decode captured bytes with explicit confidence." FontSize="9" TextWrapping="Wrap" />
+                </StackPanel>
+                <Border Grid.Column="1" Background="#19212B" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="4" Padding="8,5" VerticalAlignment="Center">
+                    <TextBlock Text="UNKNOWN · HEURISTIC · VERIFIED" FontSize="8" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" />
+                </Border>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1" ColumnDefinitions="1.1*,0.9*" ColumnSpacing="8">
+            <Border Grid.Column="0" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="5" Padding="9">
+                <Grid RowDefinitions="Auto,*" RowSpacing="6">
+                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="5">
+                        <TextBlock Text="SCHEMA DEFINITION · JSON" Classes="eyebrow" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" />
+                        <Button Grid.Column="1" Classes="tool" Content="DECODE" Command="{Binding DecodeCommand}" />
+                        <Button Grid.Column="2" Classes="tool" Content="RESET EXAMPLE" Click="OnResetExampleClick" />
+                    </Grid>
+                    <TextBox Grid.Row="1" Text="{Binding SchemaJson}" AcceptsReturn="True" TextWrapping="NoWrap" AcceptsTab="True" FontFamily="Cascadia Mono" FontSize="9" VerticalContentAlignment="Top" HorizontalContentAlignment="Left" Background="#0D1218" BorderBrush="{StaticResource LineBrush}" />
+                </Grid>
+            </Border>
+
+            <Grid Grid.Column="1" RowDefinitions="Auto,Auto,*" RowSpacing="8">
+                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="5" Padding="9">
+                    <Grid RowDefinitions="Auto,Auto" RowSpacing="5">
+                        <TextBlock Text="SCHEMA FILE" Classes="eyebrow" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="5">
+                            <TextBox Text="{Binding SchemaPath}" PlaceholderText="Path to a .json schema file" MinHeight="29" />
+                            <Button Grid.Column="1" Classes="tool" Content="LOAD" Command="{Binding LoadCommand}" />
+                            <Button Grid.Column="2" Classes="tool" Content="SAVE" Command="{Binding SaveCommand}" />
+                        </Grid>
+                    </Grid>
+                </Border>
+                <Border Grid.Row="1" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="5" Padding="9">
+                    <Grid RowDefinitions="Auto,Auto" RowSpacing="5">
+                        <TextBlock Text="CAPTURED BYTES · HEX" Classes="eyebrow" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="5">
+                            <TextBox Text="{Binding PayloadHex}" FontFamily="Cascadia Mono" MinHeight="29" PlaceholderText="A5 5A 01 02 12 34 00 00" />
+                            <Button Grid.Column="1" Classes="primary" Content="DECODE BYTES" Command="{Binding DecodeCommand}" />
+                        </Grid>
+                    </Grid>
+                </Border>
+                <Border Grid.Row="2" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="5" Padding="9">
+                    <Grid RowDefinitions="Auto,*,Auto,*" RowSpacing="5">
+                        <TextBlock Text="DECODED FIELDS" Classes="eyebrow" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <ListBox Grid.Row="1" ItemsSource="{Binding Fields}" Background="#0D1218" BorderBrush="{StaticResource LineBrush}" BorderThickness="1">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:ProtocolSchemaFieldRow">
+                                    <Grid ColumnDefinitions="*,82,72" RowDefinitions="Auto,Auto" Margin="6,4">
+                                        <TextBlock Text="{Binding Name}" FontSize="9" FontWeight="SemiBold" />
+                                        <TextBlock Grid.Column="1" Text="{Binding Type}" FontSize="8" Classes="muted" />
+                                        <TextBlock Grid.Column="2" Text="{Binding Range}" FontSize="8" Classes="mono" HorizontalAlignment="Right" />
+                                        <TextBlock Grid.Row="1" Grid.ColumnSpan="3" Text="{Binding Value}" FontSize="9" Classes="mono" Foreground="{StaticResource AccentBrush}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <TextBlock Grid.Row="2" Text="MATCH EVIDENCE / DIAGNOSTICS" Classes="eyebrow" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <ListBox Grid.Row="3" ItemsSource="{Binding Evidence}" Background="#0D1218" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" />
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <Border Grid.Row="2" Background="#0E131A" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="4" Padding="10,8">
+            <TextBlock Text="{Binding Status}" Foreground="{Binding StatusBrush}" FontSize="8" TextWrapping="Wrap" />
+        </Border>
+    </Grid>
+</UserControl>

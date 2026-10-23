@@ -1,0 +1,254 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:SignalForge.Desktop.ViewModels"
+             x:Class="SignalForge.Desktop.Views.Terminal2ProfileLibraryView"
+             x:DataType="vm:Terminal2ProfileLibraryViewModel">
+    <Grid RowDefinitions="Auto,*,Auto" Margin="16" RowSpacing="10" Background="{StaticResource CanvasBrush}">
+        <Border Background="#0E131A" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1" Padding="12,10">
+            <StackPanel Spacing="4">
+                <TextBlock Text="TERMINAL2 PROFILE LIBRARY" Classes="eyebrow" Foreground="{StaticResource AccentBrush}" />
+                <TextBlock Text="Edit reusable legacy connection, display, and logging settings here. Saving writes a compatible .profile and does not alter an active connection." FontSize="9" TextWrapping="Wrap" />
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="1" ColumnDefinitions="0.8*,1.2*" ColumnSpacing="10">
+            <Border Grid.Column="0" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="5" Padding="10">
+                <Grid RowDefinitions="Auto,Auto,*" RowSpacing="7">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="SAVED PROFILES" Classes="eyebrow" VerticalAlignment="Center" />
+                        <Button Grid.Column="1" Classes="tool" Content="REFRESH" Command="{Binding RefreshCommand}" />
+                    </Grid>
+                    <TextBox Grid.Row="1" Text="{Binding SearchText}" PlaceholderText="Search profile names" MinHeight="29" ToolTip.Tip="Filters profile names as you type; matching is case-insensitive." />
+                    <ListBox Grid.Row="2" ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile}" Background="#0D1218" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" />
+                </Grid>
+            </Border>
+
+            <Grid Grid.Column="1" RowDefinitions="Auto,*" RowSpacing="8">
+                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="5" Padding="10">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="9">
+                        <StackPanel Spacing="3" VerticalAlignment="Center">
+                            <TextBlock Text="PROFILE OPTIONS" Classes="eyebrow" Foreground="{StaticResource AccentBrush}" />
+                            <TextBlock Text="{Binding EditorStatus}" FontSize="8" TextWrapping="Wrap" />
+                        </StackPanel>
+                        <Button Grid.Column="1" Classes="primary" Content="SAVE OPTIONS" Command="{Binding SaveEditedProfileCommand}" IsEnabled="{Binding CanEditProfile}" VerticalAlignment="Center" />
+                    </Grid>
+                </Border>
+
+                <TabControl Grid.Row="1">
+                    <TabItem Header="CONNECTION + SEND">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="6" Spacing="9" IsEnabled="{Binding CanEditProfile}">
+                                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="4" Padding="10">
+                                    <StackPanel Spacing="8">
+                                        <TextBlock Text="CONNECTION" Classes="eyebrow" Foreground="{StaticResource TextSecondaryBrush}" />
+                                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="9" RowSpacing="7">
+                                            <StackPanel Grid.Row="0" Spacing="3">
+                                                <TextBlock Text="Connection type" FontSize="8" />
+                                                <ComboBox ItemsSource="{Binding ConnectionTypes}" SelectedItem="{Binding EditorConnectionType}" MinHeight="29" />
+                                            </StackPanel>
+                                            <StackPanel Grid.Row="0" Grid.Column="1" Spacing="3">
+                                                <TextBlock Text="Serial port" FontSize="8" />
+                                                <TextBox Text="{Binding EditorSerialPort}" MinHeight="29" />
+                                            </StackPanel>
+                                            <StackPanel Grid.Row="1" Spacing="3">
+                                                <TextBlock Text="Baud rate" FontSize="8" />
+                                                <TextBox Text="{Binding EditorBaudrate}" MinHeight="29" />
+                                            </StackPanel>
+                                            <StackPanel Grid.Row="1" Grid.Column="1" Spacing="3">
+                                                <TextBlock Text="Data bits" FontSize="8" />
+                                                <TextBox Text="{Binding EditorDataBits}" MinHeight="29" />
+                                            </StackPanel>
+                                            <StackPanel Grid.Row="2" Spacing="3">
+                                                <TextBlock Text="Parity" FontSize="8" />
+                                                <TextBox Text="{Binding EditorParity}" MinHeight="29" />
+                                            </StackPanel>
+                                            <StackPanel Grid.Row="2" Grid.Column="1" Spacing="3">
+                                                <TextBlock Text="Stop bits" FontSize="8" />
+                                                <TextBox Text="{Binding EditorStopBits}" MinHeight="29" />
+                                            </StackPanel>
+                                            <StackPanel Grid.Row="3" Spacing="3">
+                                                <TextBlock Text="Handshaking" FontSize="8" />
+                                                <TextBox Text="{Binding EditorHandshaking}" MinHeight="29" />
+                                            </StackPanel>
+                                            <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Bottom">
+                                                <CheckBox Content="Initial RTS" IsChecked="{Binding EditorInitialRTS}" />
+                                                <CheckBox Content="Initial DTR" IsChecked="{Binding EditorInitialDTR}" />
+                                            </StackPanel>
+                                            <StackPanel Grid.Row="4" Spacing="3">
+                                                <TextBlock Text="TCP host" FontSize="8" />
+                                                <TextBox Text="{Binding EditorTcpConnectAddress}" MinHeight="29" />
+                                            </StackPanel>
+                                            <StackPanel Grid.Row="4" Grid.Column="1" Spacing="3">
+                                                <TextBlock Text="TCP connect port" FontSize="8" />
+                                                <TextBox Text="{Binding EditorTcpConnectPort}" MinHeight="29" />
+                                            </StackPanel>
+                                            <StackPanel Grid.Row="5" Spacing="3">
+                                                <TextBlock Text="TCP listen port" FontSize="8" />
+                                                <TextBox Text="{Binding EditorTcpListenPort}" MinHeight="29" />
+                                            </StackPanel>
+                                            <CheckBox Grid.Row="5" Grid.Column="1" Content="Restart server on close" IsChecked="{Binding EditorRestartServer}" VerticalAlignment="Bottom" />
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="4" Padding="10">
+                                    <StackPanel Spacing="7">
+                                        <TextBlock Text="SEND BEHAVIOR" Classes="eyebrow" Foreground="{StaticResource TextSecondaryBrush}" />
+                                        <WrapPanel ItemWidth="150" ItemHeight="30">
+                                            <CheckBox Content="Append CR" IsChecked="{Binding EditorSendCR}" />
+                                            <CheckBox Content="Append LF" IsChecked="{Binding EditorSendLF}" />
+                                            <CheckBox Content="Clear command after send" IsChecked="{Binding EditorClearCommand}" />
+                                            <CheckBox Content="Send as you type" IsChecked="{Binding EditorSendAsYouType}" />
+                                            <CheckBox Content="Stay on top" IsChecked="{Binding EditorStayOnTop}" />
+                                        </WrapPanel>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <TabItem Header="DISPLAY">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="6" Spacing="9" IsEnabled="{Binding CanEditProfile}">
+                                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="4" Padding="10">
+                                    <StackPanel Spacing="7">
+                                        <TextBlock Text="DISPLAY OPTIONS" Classes="eyebrow" Foreground="{StaticResource TextSecondaryBrush}" />
+                                        <WrapPanel ItemWidth="155" ItemHeight="30">
+                                            <CheckBox Content="Show CR" IsChecked="{Binding EditorShowCR}" />
+                                            <CheckBox Content="Show LF" IsChecked="{Binding EditorShowLF}" />
+                                            <CheckBox Content="Input timestamp" IsChecked="{Binding EditorShowInputTimestamp}" />
+                                            <CheckBox Content="Output timestamp" IsChecked="{Binding EditorShowOutputTimestamp}" />
+                                            <CheckBox Content="ASCII display" IsChecked="{Binding EditorShowAscii}" />
+                                            <CheckBox Content="Hex display" IsChecked="{Binding EditorShowHex}" />
+                                            <CheckBox Content="Ignore case" IsChecked="{Binding EditorIgnoreCase}" />
+                                        </WrapPanel>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="4" Padding="10">
+                                    <StackPanel Spacing="8">
+                                        <TextBlock Text="FONTS AND COLORS" Classes="eyebrow" Foreground="{StaticResource TextSecondaryBrush}" />
+                                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="9" RowSpacing="7">
+                                            <StackPanel Grid.Row="0" Spacing="3">
+                                                <TextBlock Text="Input font" FontSize="8" />
+                                                <TextBox Text="{Binding EditorInputFont}" MinHeight="29" />
+                                            </StackPanel>
+                                            <StackPanel Grid.Row="0" Grid.Column="1" Spacing="3">
+                                                <TextBlock Text="Output font" FontSize="8" />
+                                                <TextBox Text="{Binding EditorOutputFont}" MinHeight="29" />
+                                            </StackPanel>
+                                            <StackPanel Grid.Row="1" Spacing="3">
+                                                <TextBlock Text="Input background (#AARRGGBB)" FontSize="8" />
+                                                <TextBox Text="{Binding EditorInputBackgroundArgb}" MinHeight="29" />
+                                            </StackPanel>
+                                            <StackPanel Grid.Row="1" Grid.Column="1" Spacing="3">
+                                                <TextBlock Text="Input text (#AARRGGBB)" FontSize="8" />
+                                                <TextBox Text="{Binding EditorInputForegroundArgb}" MinHeight="29" />
+                                            </StackPanel>
+                                            <StackPanel Grid.Row="2" Spacing="3">
+                                                <TextBlock Text="Output background (#AARRGGBB)" FontSize="8" />
+                                                <TextBox Text="{Binding EditorOutputBackgroundArgb}" MinHeight="29" />
+                                            </StackPanel>
+                                        </Grid>
+                                        <TextBlock Text="Colors are stored as 8-digit ARGB values. Filter slot colors remain in the Filters editor." FontSize="8" TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <TabItem Header="LOGGING">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="6" Spacing="9" IsEnabled="{Binding CanEditProfile}">
+                                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="4" Padding="10">
+                                    <StackPanel Spacing="8">
+                                        <TextBlock Text="LOGGING OPTIONS" Classes="eyebrow" Foreground="{StaticResource TextSecondaryBrush}" />
+                                        <TextBlock Text="These values are preserved in the Terminal2 profile. START LOG in the workspace toolbar and the #STARTLOG / #STOPLOG macro directives write a separate timestamped TX/RX hex log here; session JSONL capture continues independently." FontSize="8" TextWrapping="Wrap" />
+                                        <StackPanel Spacing="3">
+                                            <TextBlock Text="Log directory" FontSize="8" />
+                                            <TextBox Text="{Binding EditorLogDirectory}" MinHeight="29" />
+                                        </StackPanel>
+                                        <Grid ColumnDefinitions="*,*" ColumnSpacing="9">
+                                            <StackPanel Spacing="3">
+                                                <TextBlock Text="Log filename prefix" FontSize="8" />
+                                                <TextBox Text="{Binding EditorLogPrefix}" MinHeight="29" />
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1" Spacing="3">
+                                                <TextBlock Text="Maximum log size" FontSize="8" />
+                                                <TextBox Text="{Binding EditorMaxLogSize}" MinHeight="29" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <TabItem Header="LIBRARY ACTIONS">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="6" Spacing="9">
+                                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="5" Padding="12">
+                                    <StackPanel Spacing="6">
+                                        <TextBlock Text="CREATE BLANK TERMINAL2 PROFILE" Classes="eyebrow" Foreground="{StaticResource AccentBrush}" />
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="7">
+                                            <TextBox Text="{Binding NewProfileName}" PlaceholderText="New profile name" MinHeight="31" />
+                                            <Button Grid.Column="1" Classes="primary" Content="CREATE + LOAD" Command="{Binding CreateBlankProfileCommand}" IsEnabled="{Binding CanCreateBlank}" />
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+                                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="5" Padding="12">
+                                    <StackPanel Spacing="6">
+                                        <TextBlock Text="SAVE THE CURRENTLY IMPORTED PROFILE" Classes="eyebrow" Foreground="{StaticResource TextSecondaryBrush}" />
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="7">
+                                            <TextBox Text="{Binding SaveAsName}" PlaceholderText="Profile name, without .profile" MinHeight="31" />
+                                            <Button Grid.Column="1" Classes="primary" Content="SAVE TO LIBRARY" Command="{Binding SaveCurrentProfileCommand}" IsEnabled="{Binding CanSave}" />
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+                                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="5" Padding="12">
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="7">
+                                        <StackPanel Spacing="5">
+                                            <TextBlock Text="LOAD PROFILE" Classes="eyebrow" Foreground="{StaticResource TextSecondaryBrush}" />
+                                            <TextBlock Text="Loads the selected file into the Terminal2 migration workspace." FontSize="8" TextWrapping="Wrap" />
+                                        </StackPanel>
+                                        <Button Grid.Column="1" Classes="tool" Content="LOAD SELECTED" Command="{Binding LoadSelectedCommand}" IsEnabled="{Binding CanLoad}" VerticalAlignment="Center" />
+                                    </Grid>
+                                </Border>
+                                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="5" Padding="12">
+                                    <StackPanel Spacing="6">
+                                        <TextBlock Text="COPY SELECTED PROFILE" Classes="eyebrow" Foreground="{StaticResource TextSecondaryBrush}" />
+                                        <TextBlock Text="Copies the validated library profile to a new name without replacing the currently loaded workspace profile." FontSize="8" TextWrapping="Wrap" />
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="7">
+                                            <TextBox Text="{Binding CopyToName}" PlaceholderText="New profile name" MinHeight="31" IsEnabled="{Binding CanLoad}" />
+                                            <Button Grid.Column="1" Classes="tool" Content="COPY" Command="{Binding CopySelectedCommand}" IsEnabled="{Binding CanCopy}" />
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+                                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="5" Padding="12">
+                                    <StackPanel Spacing="6">
+                                        <TextBlock Text="RENAME SELECTED PROFILE" Classes="eyebrow" Foreground="{StaticResource TextSecondaryBrush}" />
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="7">
+                                            <TextBox Text="{Binding RenameTo}" PlaceholderText="New profile name" MinHeight="31" IsEnabled="{Binding CanLoad}" />
+                                            <Button Grid.Column="1" Classes="tool" Content="RENAME" Command="{Binding RenameSelectedCommand}" IsEnabled="{Binding CanRename}" />
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+                                <Border Background="#251A1C" BorderBrush="#533035" BorderThickness="1" CornerRadius="5" Padding="12">
+                                    <StackPanel Spacing="6">
+                                        <TextBlock Text="DELETE SELECTED PROFILE" Classes="eyebrow" Foreground="{StaticResource WarningBrush}" />
+                                        <TextBlock Text="This removes the selected .profile file from the local library." FontSize="8" TextWrapping="Wrap" />
+                                        <Button Classes="tool" Content="DELETE SELECTED" Command="{Binding DeleteSelectedCommand}" IsEnabled="{Binding CanDelete}" HorizontalAlignment="Left" />
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+                </TabControl>
+            </Grid>
+        </Grid>
+
+        <Border Grid.Row="2" Background="#0E131A" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="4" Padding="10,8">
+            <TextBlock Text="{Binding Status}" FontSize="8" TextWrapping="Wrap" />
+        </Border>
+    </Grid>
+</UserControl>

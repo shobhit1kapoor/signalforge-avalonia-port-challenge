@@ -1,0 +1,63 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:SignalForge.Desktop.ViewModels"
+             x:Class="SignalForge.Desktop.Views.Terminal2XModemView"
+             x:DataType="vm:Terminal2XModemViewModel">
+    <Grid RowDefinitions="38,*" Background="{StaticResource CanvasBrush}">
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Background="#0E131A">
+            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="15,0,0,0">
+                <TextBlock Text="⇧" FontSize="14" Foreground="{StaticResource AccentBrush}" />
+                <TextBlock Text="TERMINAL2 XMODEM SENDER" Classes="eyebrow" Foreground="{StaticResource TextMutedBrush}" />
+                <TextBlock Text="/" Classes="muted" />
+                <TextBlock Text="{Binding ProgressText}" FontSize="10" Foreground="{StaticResource TextPrimaryBrush}" />
+            </StackPanel>
+            <TextBlock Grid.Column="1" Text="SERIAL ONLY · EVERY BYTE RECORDED IN TRACE" Classes="eyebrow" FontSize="8" VerticalAlignment="Center" Margin="0,0,13,0" />
+        </Grid>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel MaxWidth="760" HorizontalAlignment="Left" Margin="24" Spacing="16">
+                <StackPanel Spacing="7">
+                    <TextBlock Text="SEND A FILE WITH CLASSIC XMODEM" Classes="title" />
+                    <TextBlock Text="Terminal2-compatible 128-byte SOH blocks, block number and complement, CRC-16/XMODEM, ACK/NAK retries, zero padding, and EOT acknowledgement. Receiver handshaking must already be active." FontSize="10" TextWrapping="Wrap" />
+                </StackPanel>
+
+                <Border Background="#10161E" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
+                    <StackPanel Spacing="13">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="INPUT FILE PATH" Classes="eyebrow" FontSize="8" />
+                            <TextBox Text="{Binding FilePath}" PlaceholderText="C:\path\to\payload.bin" MinHeight="32" />
+                        </StackPanel>
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="14">
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="NAK RETRY LIMIT" Classes="eyebrow" FontSize="8" />
+                                <TextBox Text="{Binding MaxNakRetries}" MinHeight="30" />
+                                <TextBlock Text="0–20 retries per block" FontSize="8" Classes="muted" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Spacing="5">
+                                <TextBlock Text="ACK TIMEOUT (MS)" Classes="eyebrow" FontSize="8" />
+                                <TextBox Text="{Binding AcknowledgementTimeoutMs}" MinHeight="30" />
+                                <TextBlock Text="1–60000 ms per response" FontSize="8" Classes="muted" />
+                            </StackPanel>
+                        </Grid>
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <Button Classes="primary" Content="START XMODEM" Command="{Binding StartCommand}" />
+                            <Button Classes="tool" Content="CANCEL" Command="{Binding CancelCommand}" />
+                            <TextBlock Text="{Binding IsSerialConnected, StringFormat='SERIAL {0}'}" FontSize="9" Classes="muted" VerticalAlignment="Center" Margin="7,0,0,0" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="#10161E" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="7" Padding="15">
+                    <StackPanel Spacing="7">
+                        <TextBlock Text="TRANSFER STATUS" Classes="eyebrow" FontSize="8" />
+                        <ProgressBar Minimum="0" Maximum="{Binding ProgressMaximum}" Value="{Binding AcknowledgedBytes}" Height="6" />
+                        <TextBlock Text="{Binding ProgressText}" FontSize="10" Foreground="{StaticResource AccentBrush}" />
+                        <TextBlock Text="{Binding Status}" FontSize="10" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
+                    </StackPanel>
+                </Border>
+
+                <TextBlock Text="Responses are taken from the active serial byte session; traces retain RX replies, each transmitted block/retry, and completion markers. A bounded receive queue cancels visibly if it fills." FontSize="9" Classes="muted" TextWrapping="Wrap" />
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

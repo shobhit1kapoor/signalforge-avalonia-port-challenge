@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SignalForge.Core/SignalForge.Core.csproj" />
+    <Project Path="src/SignalForge.Desktop/SignalForge.Desktop.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SignalForge.Core.Tests/SignalForge.Core.Tests.csproj" />
+  </Folder>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/SignalForge.Benchmarks/SignalForge.Benchmarks.csproj" />
+  </Folder>
+</Solution>

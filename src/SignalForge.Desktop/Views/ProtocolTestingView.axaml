@@ -1,0 +1,229 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:SignalForge.Desktop.ViewModels"
+             x:Class="SignalForge.Desktop.Views.ProtocolTestingView"
+             x:DataType="vm:ProtocolTestingViewModel">
+    <Grid RowDefinitions="Auto,Auto,*" Margin="12" RowSpacing="8" Background="{StaticResource CanvasBrush}">
+        <Border Grid.Row="0" Background="#0E131A" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1" Padding="12,9">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                <StackPanel Spacing="3">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="PROTOCOL TEST ENGINE" Classes="eyebrow" Foreground="{StaticResource AccentBrush}" />
+                        <TextBlock Text="·" Classes="muted" />
+                        <TextBlock Text="DETERMINISTIC SEND / EXPECT / ASSERT" Classes="eyebrow" FontSize="8" />
+                    </StackPanel>
+                    <TextBlock Text="Compose a sequence of byte sends and receive assertions. Every completed run adds trace-linked evidence to the timeline." FontSize="9" TextWrapping="Wrap" />
+                </StackPanel>
+                <Border Grid.Column="1" Background="#322C20" BorderBrush="#5D4A27" BorderThickness="1" CornerRadius="4" Padding="8,5" VerticalAlignment="Center">
+                    <TextBlock Text="LOCAL SIMULATOR OR OFFLINE TRACE ONLY" FontSize="8" FontWeight="SemiBold" Foreground="{StaticResource WarningBrush}" />
+                </Border>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="5" Padding="10,8">
+            <Grid ColumnDefinitions="1.05*,1.35*,1.25*,Auto" ColumnSpacing="9">
+                <StackPanel Spacing="3">
+                    <TextBlock Text="TEST SOURCE" Classes="eyebrow" FontSize="8" />
+                    <ComboBox ItemsSource="{Binding Sources}" SelectedItem="{Binding SelectedSource}" MinHeight="29" IsEnabled="{Binding CanEdit}" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
+                    <TextBlock Text="SOURCE EVIDENCE" Classes="eyebrow" FontSize="8" />
+                    <TextBlock Text="{Binding ReplayTraceStatus}" FontSize="8" TextWrapping="Wrap" />
+                </StackPanel>
+                <StackPanel Grid.Column="2" Spacing="3" IsVisible="{Binding IsSimulatorSource}">
+                    <TextBlock Text="SIMULATOR FAULT INJECTION" Classes="eyebrow" FontSize="8" />
+                    <ComboBox ItemsSource="{Binding SimulatorFaultPlans}" SelectedItem="{Binding SelectedSimulatorFaultPlan}" MinHeight="29" IsEnabled="{Binding CanEdit}" />
+                    <TextBlock Text="{Binding SimulatorFaultDescription}" FontSize="7" TextWrapping="Wrap" />
+                </StackPanel>
+                <StackPanel Grid.Column="2" Spacing="3" IsVisible="{Binding IsReplaySource}">
+                    <TextBlock Text="REPLAY SPEED" Classes="eyebrow" FontSize="8" />
+                    <TextBox Text="{Binding ReplaySpeed}" PlaceholderText="1.0×" MinHeight="29" IsEnabled="{Binding CanEdit}" />
+                </StackPanel>
+                <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                    <Ellipse Width="7" Height="7" Fill="{Binding StatusBrush}" />
+                    <TextBlock Text="{Binding StatusLabel}" Foreground="{Binding StatusBrush}" FontSize="8" FontWeight="SemiBold" VerticalAlignment="Center" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="2" ColumnDefinitions="1.05*,0.95*" ColumnSpacing="8">
+            <Border Grid.Column="0" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="5">
+                <Grid RowDefinitions="Auto,Auto,*">
+                    <StackPanel Grid.Row="0" Spacing="5" Margin="10,9,10,6">
+                        <TextBlock Text="TEST SEQUENCE" Classes="eyebrow" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <WrapPanel Orientation="Horizontal" ItemSpacing="5" LineSpacing="5">
+                            <Button Classes="tool" Content="+ SEND" Command="{Binding AddSendStepCommand}" IsEnabled="{Binding CanEdit}" />
+                            <Button Classes="tool" Content="+ EXPECT BYTES" Command="{Binding AddExpectedBytesStepCommand}" IsEnabled="{Binding CanEdit}" />
+                            <Button Classes="tool" Content="+ MODBUS ASSERT" Command="{Binding AddModbusAssertionStepCommand}" IsEnabled="{Binding CanEdit}" />
+                            <Button Classes="tool" Content="+ DELAY" Command="{Binding AddDelayStepCommand}" IsEnabled="{Binding CanEdit}" />
+                            <Button Classes="tool" Content="REMOVE SELECTED" Command="{Binding RemoveSelectedStepCommand}" IsEnabled="{Binding CanRemoveSelectedStep}" />
+                            <Button Classes="tool" Content="LOAD READ EXAMPLE" Command="{Binding LoadReadExampleCommand}" IsEnabled="{Binding CanEdit}" />
+                            <Button Classes="tool" Content="LOAD STX/LRC EXAMPLE" Command="{Binding LoadStxEtxLrcExampleCommand}" IsEnabled="{Binding CanEdit}" />
+                        </WrapPanel>
+                    </StackPanel>
+                    <Border Grid.Row="1" Background="#0E131A" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1" Padding="8,5">
+                        <TextBlock Text="Edit hex as byte pairs. Receive steps use bounded timeouts; blank Modbus fields are wildcards. STX/LRC example checks frame bytes and validates LRC." FontSize="8" TextWrapping="Wrap" />
+                    </Border>
+                    <ListBox Grid.Row="2" ItemsSource="{Binding Steps}" SelectedItem="{Binding SelectedStep}" IsEnabled="{Binding CanEdit}" Background="#0D1218" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" Margin="8">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ProtocolTestStepEditor">
+                                <Border Background="#10161E" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="4" Padding="8" Margin="3">
+                                    <Grid RowDefinitions="Auto,Auto">
+                                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                                            <Border Background="{StaticResource AccentDimBrush}" CornerRadius="3" Padding="5,3" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Type}" FontSize="8" FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}" />
+                                            </Border>
+                                            <TextBox Grid.Column="1" Text="{Binding Name}" MinHeight="27" />
+                                            <TextBlock Grid.Column="2" Text="STEP" Classes="muted" FontSize="8" VerticalAlignment="Center" />
+                                        </Grid>
+
+                                        <Grid Grid.Row="1" Margin="0,6,0,0">
+                                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6" IsVisible="{Binding IsSend}">
+                                                <StackPanel Spacing="2">
+                                                    <TextBlock Text="BYTES TO SEND · HEX" Classes="eyebrow" FontSize="7" />
+                                                    <TextBox Text="{Binding HexBytes}" FontFamily="Cascadia Mono" MinHeight="27" PlaceholderText="01 A0 FF" />
+                                                </StackPanel>
+                                            </Grid>
+                                            <Grid ColumnDefinitions="1.15*,0.85*,Auto" ColumnSpacing="6" IsVisible="{Binding IsExpectBytes}">
+                                                <StackPanel Spacing="2">
+                                                    <TextBlock Text="EXPECTED BYTES · HEX" Classes="eyebrow" FontSize="7" />
+                                                    <TextBox Text="{Binding HexBytes}" FontFamily="Cascadia Mono" MinHeight="27" PlaceholderText="01 03 02 12 34" />
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="1" Spacing="2">
+                                                    <TextBlock Text="OPTIONAL BIT MASK" Classes="eyebrow" FontSize="7" />
+                                                    <TextBox Text="{Binding MaskHex}" FontFamily="Cascadia Mono" MinHeight="27" PlaceholderText="FF FF 00 FF" />
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="2" Spacing="2" Width="78">
+                                                    <TextBlock Text="TIMEOUT MS" Classes="eyebrow" FontSize="7" />
+                                                    <TextBox Text="{Binding TimeoutMs}" MinHeight="27" />
+                                                </StackPanel>
+                                            </Grid>
+                                            <Grid ColumnDefinitions="0.85*,0.65*,0.65*,0.65*,0.7*" ColumnSpacing="5" IsVisible="{Binding IsModbusAssertion}">
+                                                <StackPanel Spacing="2">
+                                                    <TextBlock Text="TRANSACTION ID" Classes="eyebrow" FontSize="7" />
+                                                    <TextBox Text="{Binding TransactionId}" MinHeight="27" PlaceholderText="any" />
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="1" Spacing="2">
+                                                    <TextBlock Text="UNIT ID" Classes="eyebrow" FontSize="7" />
+                                                    <TextBox Text="{Binding UnitId}" MinHeight="27" PlaceholderText="any" />
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="2" Spacing="2">
+                                                    <TextBlock Text="FUNCTION" Classes="eyebrow" FontSize="7" />
+                                                    <TextBox Text="{Binding FunctionCode}" MinHeight="27" PlaceholderText="any" />
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="3" Spacing="2">
+                                                    <TextBlock Text="EXCEPTION" Classes="eyebrow" FontSize="7" />
+                                                    <TextBox Text="{Binding ExceptionCode}" MinHeight="27" PlaceholderText="none" />
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="4" Spacing="2">
+                                                    <TextBlock Text="TIMEOUT MS" Classes="eyebrow" FontSize="7" />
+                                                    <TextBox Text="{Binding TimeoutMs}" MinHeight="27" />
+                                                </StackPanel>
+                                            </Grid>
+                                            <Grid ColumnDefinitions="Auto,90,*" ColumnSpacing="6" IsVisible="{Binding IsDelay}">
+                                                <TextBlock Text="WAIT DURATION · MS" Classes="eyebrow" FontSize="7" VerticalAlignment="Center" />
+                                                <TextBox Grid.Column="1" Text="{Binding DelayMs}" MinHeight="27" />
+                                            </Grid>
+                                        </Grid>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Column="1" RowDefinitions="Auto,1.25*,0.85*,0.9*" RowSpacing="8">
+                <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="5" Padding="10">
+                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6">
+                        <StackPanel Spacing="4" VerticalAlignment="Center">
+                            <TextBlock Text="RUN CONTROL" Classes="eyebrow" Foreground="{StaticResource TextSecondaryBrush}" />
+                            <TextBlock Text="{Binding RunMessage}" FontSize="8" TextWrapping="Wrap" />
+                        </StackPanel>
+                        <Button Grid.Column="1" Classes="primary" Content="RUN TEST" Command="{Binding RunTestCommand}" IsEnabled="{Binding CanRunTest}" VerticalAlignment="Center" />
+                        <Button Grid.Column="2" Classes="tool" Content="CANCEL" Command="{Binding CancelTestCommand}" IsEnabled="{Binding CanCancelTest}" VerticalAlignment="Center" />
+                    </Grid>
+                </Border>
+
+                <Border Grid.Row="1" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="5" Padding="8" IsVisible="{Binding IsModbusSimulatorSource}">
+                    <Grid RowDefinitions="Auto,*" RowSpacing="5">
+                        <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="7">
+                            <TextBlock Text="LIVE DEVICE STATE MACHINE" Classes="eyebrow" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" />
+                            <Border Grid.Column="1" Background="#171E28" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="3" Padding="5,2">
+                                <TextBlock Text="{Binding DeviceServerStateLabel}" Foreground="{Binding DeviceStateBrush}" FontSize="7" FontWeight="Bold" />
+                            </Border>
+                            <TextBlock Grid.Column="2" Text="{Binding DeviceEndpoint}" Classes="muted" FontSize="7" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <TextBlock Text="{Binding DeviceActivityStatus}" FontSize="7" TextWrapping="Wrap" VerticalAlignment="Center" IsVisible="{Binding HasNoDeviceActivity}" />
+                            <ListBox ItemsSource="{Binding DeviceActivity}" IsVisible="{Binding HasDeviceActivity}" MaxHeight="102" Background="#0D1218" BorderBrush="{StaticResource LineBrush}" BorderThickness="1">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:VirtualDeviceActivityRow">
+                                        <Grid ColumnDefinitions="48,66,*" RowDefinitions="Auto,Auto,Auto" Margin="3,2">
+                                            <TextBlock Text="{Binding Elapsed}" Classes="mono" FontSize="6" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="{Binding Kind}" FontSize="6" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="2" Text="{Binding Transition}" Foreground="{StaticResource AccentBrush}" FontSize="6" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Message}" FontSize="6" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding PayloadHex}" Classes="mono" Foreground="{StaticResource TextMutedBrush}" FontSize="6" TextTrimming="CharacterEllipsis" IsVisible="{Binding HasPayload}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <Border Grid.Row="2" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="5" Padding="8">
+                    <Grid RowDefinitions="Auto,*">
+                        <TextBlock Text="STEP RESULTS" Classes="eyebrow" Foreground="{StaticResource TextSecondaryBrush}" Margin="2,0,0,5" />
+                        <ListBox Grid.Row="1" ItemsSource="{Binding Results}" Background="#0D1218" BorderBrush="{StaticResource LineBrush}" BorderThickness="1">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:ProtocolTestStepResultRow">
+                                    <Grid ColumnDefinitions="42,*,Auto" RowDefinitions="Auto,Auto" Margin="6,5">
+                                        <TextBlock Text="{Binding State}" Foreground="{Binding StateBrush}" FontSize="8" FontWeight="Bold" VerticalAlignment="Center" />
+                                        <StackPanel Grid.Column="1" Spacing="2">
+                                            <TextBlock Text="{Binding Name}" FontSize="9" FontWeight="SemiBold" />
+                                            <TextBlock Text="{Binding Detail}" FontSize="8" TextWrapping="Wrap" />
+                                        </StackPanel>
+                                            <TextBlock Grid.Column="2" Text="{Binding StepNumber}" Classes="muted" FontSize="8" VerticalAlignment="Center" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+                </Border>
+
+                <Border Grid.Row="3" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="5" Padding="8">
+                    <Grid RowDefinitions="Auto,Auto,*" RowSpacing="5">
+                        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6" Margin="2,0,0,5">
+                            <TextBlock Text="BYTE EVIDENCE · LINKED TO TRACE TIMELINE" Classes="eyebrow" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Classes="tool" Content="OPEN IN TIMELINE" Command="{Binding OpenSelectedTraceEventCommand}" IsEnabled="{Binding CanOpenSelectedTraceEvent}" />
+                            <Button Grid.Column="2" Classes="tool" Content="CLEAR RESULTS" Command="{Binding ClearResultsCommand}" IsEnabled="{Binding CanEdit}" />
+                        </Grid>
+                        <Grid Grid.Row="1" RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto" ColumnSpacing="6" RowSpacing="3">
+                            <TextBox Text="{Binding ReportPath}" IsEnabled="{Binding CanEdit}" FontSize="8" MinHeight="27" PlaceholderText="Full path for the versioned JSON report" />
+                            <Button Grid.Column="1" Classes="tool" Content="EXPORT REPORT" Command="{Binding ExportReportCommand}" IsEnabled="{Binding CanExportReport}" />
+                            <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding ReportStatus}" FontSize="7" TextWrapping="Wrap" />
+                        </Grid>
+                        <Grid Grid.Row="2" RowDefinitions="*,Auto" RowSpacing="5">
+                            <ListBox ItemsSource="{Binding Evidence}" SelectedItem="{Binding SelectedEvidenceRow}" Background="#0D1218" BorderBrush="{StaticResource LineBrush}" BorderThickness="1">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:ProtocolTestEvidenceRow">
+                                        <Grid ColumnDefinitions="32,62,*" RowDefinitions="Auto,Auto,Auto" Margin="6,5">
+                                            <TextBlock Text="{Binding DirectionLabel}" FontSize="8" FontWeight="Bold" Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="{Binding Elapsed}" Classes="mono" FontSize="8" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="2" Text="{Binding StepName}" FontSize="8" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Hex}" Classes="mono" FontSize="8" TextWrapping="Wrap" />
+                                            <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding TraceReference}" FontSize="7" Foreground="{StaticResource TextMutedBrush}" TextTrimming="CharacterEllipsis" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                            <TextBlock Grid.Row="1" Text="{Binding TraceLinkStatus}" FontSize="7" TextWrapping="Wrap" />
+                        </Grid>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

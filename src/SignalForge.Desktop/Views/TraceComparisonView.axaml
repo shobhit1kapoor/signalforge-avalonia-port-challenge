@@ -1,0 +1,85 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:SignalForge.Desktop.ViewModels"
+             x:Class="SignalForge.Desktop.Views.TraceComparisonView"
+             x:DataType="vm:TraceComparisonViewModel">
+    <Grid RowDefinitions="Auto,Auto,*" Margin="12" RowSpacing="8" Background="{StaticResource CanvasBrush}">
+        <Border Background="#0E131A" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1" Padding="12,9">
+            <StackPanel Spacing="3">
+                <TextBlock Text="PAIRED TRACE FORENSICS" Classes="eyebrow" Foreground="{StaticResource AccentBrush}" />
+                <TextBlock Text="Align two captures by observation order. Select a difference to open its actual event in the main timeline; missing rows open the expected event. Use the side buttons to open either trace." FontSize="9" TextWrapping="Wrap" />
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="1" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="5" Padding="9">
+            <Grid ColumnDefinitions="*,*,Auto,Auto,Auto" ColumnSpacing="7">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="EXPECTED / BASELINE TRACE" Classes="eyebrow" FontSize="8" />
+                    <TextBox Text="{Binding ExpectedTracePath}" PlaceholderText="Path to baseline JSONL trace" MinHeight="30" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Spacing="4">
+                    <TextBlock Text="ACTUAL / COMPARISON TRACE" Classes="eyebrow" FontSize="8" />
+                    <TextBox Text="{Binding ActualTracePath}" PlaceholderText="Path to comparison JSONL trace" MinHeight="30" />
+                </StackPanel>
+                <Button Grid.Column="2" Classes="primary" Content="COMPARE TRACES" Command="{Binding CompareCommand}" IsEnabled="{Binding CanCompare}" VerticalAlignment="Bottom" />
+                <Button Grid.Column="3" Classes="tool" Content="OPEN EXPECTED" Command="{Binding OpenExpectedEventCommand}" IsEnabled="{Binding CanOpenExpectedEvent}" VerticalAlignment="Bottom" ToolTip.Tip="Open the selected row's expected event in the main timeline." />
+                <Button Grid.Column="4" Classes="tool" Content="OPEN ACTUAL" Command="{Binding OpenActualEventCommand}" IsEnabled="{Binding CanOpenActualEvent}" VerticalAlignment="Bottom" ToolTip.Tip="Open the selected row's actual event in the main timeline." />
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="2" RowDefinitions="Auto,*" RowSpacing="7">
+            <Border Background="#0E131A" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="4" Padding="10,8">
+                <StackPanel Spacing="3">
+                    <TextBlock Text="{Binding Status}" Foreground="{Binding StatusBrush}" FontSize="8" TextWrapping="Wrap" />
+                    <TextBlock Text="{Binding FirstDivergenceSummary}" FontSize="8" Foreground="{StaticResource WarningBrush}" TextWrapping="Wrap" />
+                    <TextBlock Text="{Binding FirstTimingDivergenceSummary}" FontSize="8" Classes="mono" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
+                    <TextBlock Text="{Binding RootCauseHint}" FontSize="8" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+            <Border Grid.Row="1" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="5" Padding="8">
+                <Grid RowDefinitions="Auto,*" RowSpacing="5">
+                    <Grid ColumnDefinitions="54,*,*,145,*,190" ColumnSpacing="7" Margin="5,2">
+                        <TextBlock Text="STATE" Classes="eyebrow" FontSize="7" />
+                        <TextBlock Grid.Column="1" Text="EXPECTED EVENT" Classes="eyebrow" FontSize="7" />
+                        <TextBlock Grid.Column="2" Text="ACTUAL EVENT" Classes="eyebrow" FontSize="7" />
+                        <TextBlock Grid.Column="3" Text="BYTE OFFSETS" Classes="eyebrow" FontSize="7" />
+                        <TextBlock Grid.Column="4" Text="SYNCED SESSION TIME · SHARED 0–T SCALE" Classes="eyebrow" FontSize="7" />
+                        <TextBlock Grid.Column="5" Text="DIFFERENCE" Classes="eyebrow" FontSize="7" />
+                    </Grid>
+                    <ListBox Grid.Row="1" ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedRow}" Background="#0D1218" BorderBrush="{StaticResource LineBrush}" BorderThickness="1">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="vm:TraceComparisonRow">
+                                <Grid ColumnDefinitions="54,*,*,145,*,190" ColumnSpacing="7" Margin="5,5">
+                                    <TextBlock Text="{Binding State}" FontSize="8" FontWeight="Bold" Foreground="{StaticResource AccentBrush}" TextTrimming="CharacterEllipsis" />
+                                    <StackPanel Grid.Column="1" Spacing="2">
+                                        <TextBlock Text="{Binding ExpectedEvent}" FontSize="8" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Text="{Binding ExpectedTraceReference}" FontSize="7" Foreground="#8995A4" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding ExpectedTraceId}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" Spacing="2">
+                                        <TextBlock Text="{Binding ActualEvent}" FontSize="8" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Text="{Binding ActualTraceReference}" FontSize="7" Foreground="#8995A4" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding ActualTraceId}" />
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="3" Text="{Binding ByteDifference}" Classes="mono" FontSize="8" TextTrimming="CharacterEllipsis" />
+                                    <StackPanel Grid.Column="4" Spacing="2" ToolTip.Tip="{Binding Timing}">
+                                        <Grid ColumnDefinitions="10,*,48" ColumnSpacing="4">
+                                            <TextBlock Text="E" Classes="eyebrow" FontSize="7" VerticalAlignment="Center" />
+                                            <ProgressBar Grid.Column="1" Minimum="0" Maximum="100" Value="{Binding ExpectedTimelinePercent}" Height="4" VerticalAlignment="Center" Foreground="{StaticResource AccentBrush}" />
+                                            <TextBlock Grid.Column="2" Text="{Binding ExpectedTimeLabel}" Classes="mono" FontSize="7" TextAlignment="Right" />
+                                        </Grid>
+                                        <Grid ColumnDefinitions="10,*,48" ColumnSpacing="4">
+                                            <TextBlock Text="A" Classes="eyebrow" FontSize="7" VerticalAlignment="Center" />
+                                            <ProgressBar Grid.Column="1" Minimum="0" Maximum="100" Value="{Binding ActualTimelinePercent}" Height="4" VerticalAlignment="Center" Foreground="{StaticResource WarningBrush}" />
+                                            <TextBlock Grid.Column="2" Text="{Binding ActualTimeLabel}" Classes="mono" FontSize="7" TextAlignment="Right" />
+                                        </Grid>
+                                        <TextBlock Text="{Binding Timing}" Classes="mono" FontSize="7" TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="5" Text="{Binding Detail}" FontSize="8" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Detail}" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -1,0 +1,79 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:SignalForge.Desktop.ViewModels"
+             x:Class="SignalForge.Desktop.Views.Terminal2ReceiveHistoryView"
+             x:DataType="vm:Terminal2ReceiveHistoryViewModel">
+    <Grid RowDefinitions="38,*" Background="{StaticResource CanvasBrush}">
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Background="#0E131A">
+            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="15,0,0,0">
+                <TextBlock Text="≋" FontSize="14" Foreground="{StaticResource AccentBrush}" />
+                <TextBlock Text="TERMINAL2 RX LINE HISTORY" Classes="eyebrow" Foreground="{StaticResource TextMutedBrush}" />
+                <TextBlock Text="/" Classes="muted" />
+                <TextBlock Text="{Binding LineCountText}" FontSize="9" Foreground="{StaticResource TextPrimaryBrush}" />
+            </StackPanel>
+            <TextBlock Grid.Column="1" Text="LINE VIEW · RAW TRACE BYTES PRESERVED" Classes="eyebrow" FontSize="8" VerticalAlignment="Center" Margin="0,0,13,0" />
+        </Grid>
+
+        <Grid Grid.Row="1" RowDefinitions="Auto,Auto,Auto,*,Auto" Margin="12" RowSpacing="8">
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="6">
+                <TextBox Text="{Binding SearchText}" PlaceholderText="Search visible receive history" MinHeight="31" />
+                <Button Grid.Column="1" Classes="tool" Content="PREVIOUS" Command="{Binding SearchPreviousCommand}" IsEnabled="{Binding CanSearch}" />
+                <Button Grid.Column="2" Classes="tool" Content="NEXT" Command="{Binding SearchNextCommand}" IsEnabled="{Binding CanSearch}" />
+                <CheckBox Grid.Column="3" Content="Ignore case" IsChecked="{Binding SearchIgnoreCase}" FontSize="8" VerticalAlignment="Center" />
+            </Grid>
+
+            <Grid Grid.Row="1" ColumnDefinitions="Auto,Auto,Auto,*,Auto,Auto,Auto" ColumnSpacing="6">
+                <Button Classes="tool" Content="{Binding FreezeButtonText}" Command="{Binding ToggleFreezeCommand}" />
+                <Button Grid.Column="1" Classes="tool" Content="CLEAR HISTORY" Command="{Binding ClearHistoryCommand}" />
+                <CheckBox Grid.Column="2" Content="Stop at" IsChecked="{Binding StopAtEnabled}" FontSize="8" VerticalAlignment="Center" />
+                <TextBox Grid.Column="3" Text="{Binding StopAtText}" PlaceholderText="Freeze on matching complete line" MinHeight="29" IsEnabled="{Binding StopAtEnabled}" />
+                <TextBlock Grid.Column="4" Text="{Binding Status}" FontSize="8" VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="220" />
+                <Border Grid.Column="5" Background="#19212B" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="3" Padding="6,3" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding LineCountText}" FontSize="7" Foreground="{StaticResource TextMutedBrush}" />
+                </Border>
+                <Button Grid.Column="6" Classes="tool" Content="RECALL COMMAND" Command="{Binding RecallSelectedLineCommand}"
+                        IsEnabled="{Binding CanRecallSelectedLine}" ToolTip.Tip="Copy the displayed text of the selected completed RX line into the command editor. This does not send bytes." />
+            </Grid>
+
+            <Border Grid.Row="2" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="5" Padding="9">
+                <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="4">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="CURRENT PARTIAL RX LINE" Classes="eyebrow" FontSize="8" Foreground="{StaticResource AccentBrush}" />
+                        <TextBlock Grid.Column="1" Text="{Binding CurrentLineSource}" Classes="eyebrow" FontSize="8" />
+                    </Grid>
+                    <TextBlock Grid.Row="1" Text="{Binding CurrentLinePreview}" Classes="mono" FontSize="9" TextWrapping="Wrap" MaxHeight="34" />
+                    <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
+                        <TextBlock Text="{Binding CurrentLineHex}" Classes="mono" FontSize="8" TextWrapping="Wrap" MaxHeight="28" />
+                        <TextBlock Grid.Column="1" Text="{Binding CurrentLineStatus}" FontSize="7" VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="190" />
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <ListBox Grid.Row="3" ItemsSource="{Binding Lines}" SelectedItem="{Binding SelectedLine}"
+                     DoubleTapped="OnLinesDoubleTapped"
+                     Background="#0D1218" BorderBrush="{StaticResource LineBrush}" BorderThickness="1">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:Terminal2ReceiveLineRow">
+                        <Grid ColumnDefinitions="78,*,42,44,54" MinHeight="28" Margin="5,2" Background="{Binding FilterBackground}">
+                            <TextBlock Text="{Binding Timestamp}" Classes="mono" FontSize="8" VerticalAlignment="Center" Foreground="{Binding FilterForeground}" />
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Text}" Classes="mono" FontSize="9" TextTrimming="CharacterEllipsis" Foreground="{Binding FilterForeground}" />
+                                <TextBlock Text="{Binding Source}" Classes="eyebrow" FontSize="7" Foreground="{Binding FilterForeground}" />
+                            </StackPanel>
+                            <TextBlock Grid.Column="2" Text="{Binding LineNumber}" Classes="mono" FontSize="8" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                            <TextBlock Grid.Column="3" Text="{Binding EndingLabel}" Classes="eyebrow" FontSize="7" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                            <TextBlock Grid.Column="4" Text="{Binding FilterLabel}" Classes="eyebrow" FontSize="7" VerticalAlignment="Center" HorizontalAlignment="Right" Foreground="{StaticResource AccentBrush}" />
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <Border Grid.Row="4" Background="#0E131A" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="4" Padding="9">
+                <Grid RowDefinitions="Auto,Auto" RowSpacing="5">
+                    <TextBlock Text="{Binding SelectedLineMeta}" Classes="eyebrow" FontSize="8" />
+                    <TextBlock Grid.Row="1" Text="{Binding SelectedLineBytes}" Classes="mono" FontSize="8" TextWrapping="Wrap" MaxHeight="40" />
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

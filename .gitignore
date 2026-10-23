@@ -1,0 +1,12 @@
+**/bin/
+**/obj/
+.vs/
+.idea/
+.DS_Store
+Thumbs.db
+*.user
+*.suo
+external/Terminal2/
+artifacts/
+coverage/
+**/TestResults/

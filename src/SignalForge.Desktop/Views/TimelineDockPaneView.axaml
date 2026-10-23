@@ -1,0 +1,52 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:vm="using:SignalForge.Desktop.ViewModels" xmlns:rt="clr-namespace:RoyalTerminal.Avalonia.Controls;assembly=RoyalTerminal.Avalonia" xmlns:views="using:SignalForge.Desktop.Views" xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls" x:DataType="vm:MainViewModel" x:Class="SignalForge.Desktop.Views.TimelineDockPaneView">
+  <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0">
+    <Grid RowDefinitions="45,1,*">
+      <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,*,Auto,Auto" Margin="15,0">
+        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+          <TextBlock Text="◷" FontSize="15" Foreground="{StaticResource AccentBrush}" />
+          <TextBlock Text="EVENT TIMELINE" Classes="eyebrow" Foreground="{StaticResource TextSecondaryBrush}" />
+        </StackPanel>
+        <Border Grid.Column="1" Background="#19212B" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="3" Padding="6,3" Margin="12,0,0,0" VerticalAlignment="Center">
+          <TextBlock Text="{Binding TraceStateLabel}" FontSize="8" FontWeight="SemiBold" Foreground="{StaticResource TextMutedBrush}" />
+        </Border>
+        <TextBlock Grid.Column="2" Text="{Binding DisplayProjectionStatus}" Classes="eyebrow" FontSize="7" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,10,0" MaxWidth="320" TextTrimming="CharacterEllipsis" />
+        <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="5" VerticalAlignment="Center" Margin="0,0,8,0">
+          <TextBox Text="{Binding TraceFilePath}" PlaceholderText="Trace JSONL path" MinWidth="210" MaxWidth="350" />
+          <Button Classes="tool" Content="LOAD TRACE" Command="{Binding LoadTraceCommand}" ToolTip.Tip="Load a completed SignalForge JSONL trace from this path." />
+          <TextBox Text="{Binding ReplaySpeed}" PlaceholderText="1.0×" Width="54" ToolTip.Tip="Replay speed multiplier; use a value greater than zero." />
+          <Button Classes="tool" Content="REPLAY" Command="{Binding ReplayTraceCommand}" ToolTip.Tip="Replay loaded RX bytes and verify sent bytes against the trace." />
+        </StackPanel>
+        <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+          <Button Classes="tool" Content="PAUSE" Command="{Binding PauseReplayCommand}" IsEnabled="{Binding CanPauseReplay}" />
+          <Button Classes="tool" Content="RESUME" Command="{Binding ResumeReplayCommand}" IsEnabled="{Binding CanResumeReplay}" />
+          <TextBox Text="{Binding ReplaySeekSequence}" PlaceholderText="SEQ" Width="58" ToolTip.Tip="Trace event sequence to seek to. Pause replay before seeking." />
+          <Button Classes="tool" Content="SEEK" Command="{Binding SeekReplayCommand}" IsEnabled="{Binding CanSeekReplay}" />
+        </StackPanel>
+      </Grid>
+      <Border Grid.Row="1" Background="{StaticResource LineBrush}" />
+      <Grid Grid.Row="2" ColumnDefinitions="146,*,Auto">
+        <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="17,0,0,0" Spacing="4">
+          <TextBlock Text="SESSION EVENTS" Classes="eyebrow" FontSize="8" />
+          <TextBlock Text="{Binding TraceEventCount}" FontSize="9" />
+          <TextBlock Text="{Binding OperationMessage}" FontSize="8" TextWrapping="Wrap" MaxWidth="125" />
+        </StackPanel>
+        <ListBox Grid.Column="1" ItemsSource="{Binding Timeline}" SelectedItem="{Binding SelectedTraceRow}" Background="#0D1218" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" Margin="8,9,8,9">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:TraceEventRow">
+              <Grid ColumnDefinitions="76,42,*,70" MinHeight="28" Margin="6,2" Background="{Binding FilterBackground}">
+                <TextBlock Grid.Column="0" Text="{Binding Timestamp}" Classes="mono" FontSize="9" VerticalAlignment="Center" Foreground="{Binding FilterForeground}" />
+                <TextBlock Grid.Column="1" Text="{Binding Direction}" FontSize="9" FontWeight="Bold" Foreground="{Binding FilterForeground}" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="2" Text="{Binding Summary}" FontSize="9" VerticalAlignment="Center" Foreground="{Binding FilterForeground}" />
+                <TextBlock Grid.Column="3" Text="{Binding Source}" Classes="eyebrow" FontSize="8" VerticalAlignment="Center" HorizontalAlignment="Right" />
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+        <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="5" Width="188" Margin="0,0,14,0">
+          <TextBlock Text="{Binding ReplayCursorText}" Classes="eyebrow" FontSize="7" TextWrapping="Wrap" />
+          <TextBlock Text="{Binding ReplayControlStatus}" FontSize="8" TextWrapping="Wrap" />
+        </StackPanel>
+      </Grid>
+    </Grid>
+  </Border>
+</UserControl>

@@ -1,0 +1,40 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="SignalForge.Desktop.Views.RemoteTerminalView">
+    <Grid RowDefinitions="Auto,*,28" Background="#090C11">
+        <Border Grid.Row="0" Background="#0E131A" BorderBrush="#26333E" BorderThickness="0,0,0,1" Padding="14,10">
+            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="8">
+                <StackPanel Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="REMOTE TERMINAL" FontSize="10" FontWeight="SemiBold" Foreground="#7DD3C8" />
+                    <TextBlock Text="SSH · TELNET" FontSize="9" Foreground="#7B8998" VerticalAlignment="Center" />
+                </StackPanel>
+
+                <Grid Grid.Row="1" ColumnDefinitions="100,*,78,*,*" ColumnSpacing="8">
+                    <ComboBox x:Name="TransportPicker" SelectedIndex="0" MinHeight="32">
+                        <ComboBoxItem Content="SSH" />
+                        <ComboBoxItem Content="Telnet" />
+                    </ComboBox>
+                    <TextBox x:Name="HostInput" Grid.Column="1" PlaceholderText="Host or IP address" MinHeight="32" />
+                    <TextBox x:Name="PortInput" Grid.Column="2" Text="22" PlaceholderText="Port" MinHeight="32" />
+                    <TextBox x:Name="UsernameInput" Grid.Column="3" PlaceholderText="SSH username" MinHeight="32" />
+                    <TextBox x:Name="PasswordInput" Grid.Column="4" PasswordChar="●" PlaceholderText="SSH password (session only)" MinHeight="32" />
+                </Grid>
+
+                <Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                    <TextBox x:Name="HostFingerprintInput" PlaceholderText="Optional SSH host key SHA-256 fingerprint; otherwise use known_hosts" MinHeight="30" />
+                    <Button x:Name="ConnectButton" Grid.Column="1" Content="CONNECT" Click="OnConnectClicked" MinWidth="100" />
+                    <Button x:Name="DisconnectButton" Grid.Column="2" Content="DISCONNECT" Click="OnDisconnectClicked" IsEnabled="False" MinWidth="110" />
+                </Grid>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1" Background="#090C11" Padding="10">
+            <Grid x:Name="TerminalHost" />
+        </Border>
+
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Background="#0E131A" Margin="0">
+            <TextBlock x:Name="StatusText" Text="Enter a remote endpoint to connect." FontSize="9" VerticalAlignment="Center" Margin="13,0" Foreground="#AAB6C3" />
+            <TextBlock Grid.Column="1" Text="TELNET TRANSMITS UNENCRYPTED DATA" FontSize="8" VerticalAlignment="Center" Margin="0,0,13,0" Foreground="#D9AA61" />
+        </Grid>
+    </Grid>
+</UserControl>

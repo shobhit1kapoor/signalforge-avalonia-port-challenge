@@ -1,0 +1,104 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:SignalForge.Desktop.ViewModels"
+        xmlns:rt="clr-namespace:RoyalTerminal.Avalonia.Controls;assembly=RoyalTerminal.Avalonia"
+        xmlns:views="using:SignalForge.Desktop.Views"
+        xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+        x:Class="SignalForge.Desktop.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Title="SignalForge — Protocol Studio"
+        Width="1480"
+        Height="940"
+        MinWidth="1120"
+        MinHeight="700"
+        Background="{StaticResource CanvasBrush}"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid x:Name="LayoutRoot">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="54" />
+            <RowDefinition Height="36" />
+            <RowDefinition Height="1" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="*" MinHeight="200" />
+            <RowDefinition Height="27" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Background="{StaticResource SurfaceBrush}">
+            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="11" VerticalAlignment="Center" Margin="18,0,0,0">
+                <Border Width="30" Height="30" CornerRadius="7" Background="#15383B" BorderBrush="#2C6B68" BorderThickness="1">
+                    <TextBlock Text="S" FontSize="17" FontWeight="Bold" Foreground="{StaticResource AccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+                <StackPanel Spacing="1" VerticalAlignment="Center">
+                    <TextBlock Text="SIGNALFORGE" FontSize="13" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                    <TextBlock Text="PROTOCOL STUDIO" Classes="eyebrow" FontSize="9" />
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="17" VerticalAlignment="Center" Margin="34,0,0,0">
+                <TextBlock Text="BYTE WORKBENCH" Classes="eyebrow" Foreground="{StaticResource AccentBrush}" />
+                <TextBlock Text="TRANSPORTS" Classes="eyebrow" />
+                <TextBlock Text="TRACE REPLAY" Classes="eyebrow" />
+                <TextBlock Text="LOCAL SHELL" Classes="eyebrow" />
+            </StackPanel>
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="7" Margin="0,0,17,0" VerticalAlignment="Center">
+                <TextBlock x:Name="LayoutNotice" IsVisible="False" Text="" FontSize="8" Foreground="{StaticResource WarningBrush}"
+                           VerticalAlignment="Center" MaxWidth="250" TextTrimming="CharacterEllipsis"
+                           ToolTip.Tip="Dock layout could not be restored or saved." />
+                <Button Classes="tool" Content="COMMANDS" Click="OnOpenCommandPaletteClicked"
+                        ToolTip.Tip="Search workspace actions · Ctrl+Shift+P on Windows/Linux · ⌘+Shift+P on macOS. Navigate views with Ctrl/⌘+Tab, Ctrl/⌘+PageUp/PageDown, or Ctrl/⌘+1–9." />
+                <Button Classes="tool" Content="RESET LAYOUT" Click="OnResetLayoutClicked"
+                        ToolTip.Tip="Restore and save the default dock layout · Ctrl+Shift+R on Windows/Linux · ⌘+Shift+R on macOS." />
+                <Border Background="#322C20" BorderBrush="#5D4A27" BorderThickness="1" CornerRadius="4" Padding="8,4">
+                    <TextBlock Text="DEMO FIXTURES ARE SIMULATED" FontSize="9" FontWeight="SemiBold" Foreground="{StaticResource WarningBrush}" />
+                </Border>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Background="#0E131A">
+            <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center" Margin="19,0,0,0">
+                <TextBlock Text="WORKSPACE" Classes="eyebrow" Foreground="{StaticResource AccentBrush}" />
+                <TextBlock Text="/" Classes="muted" />
+                <TextBlock Text="Untitled investigation" FontSize="11" Foreground="{StaticResource TextPrimaryBrush}" />
+                <TextBlock Text="BYTE SESSION + LOCAL PTY" Classes="eyebrow" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="7" VerticalAlignment="Center" Margin="0,0,17,0">
+                <Ellipse Width="7" Height="7" Fill="{Binding TransportIndicatorBrush}" />
+                <TextBlock Text="{Binding TransportStatus}" FontSize="10" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
+            </StackPanel>
+        </Grid>
+        <Border Grid.Row="2" Background="{StaticResource LineBrush}" />
+
+        <Grid Grid.Row="3" ColumnDefinitions="*,Auto" Background="{StaticResource SurfaceBrush}">
+            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="17,0,0,0">
+                <Border Background="{StaticResource AccentDimBrush}" BorderBrush="#2A6463" BorderThickness="1" CornerRadius="4" Padding="9,5">
+                    <TextBlock Text="BYTE SESSION" FontSize="9" FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}" />
+                </Border>
+                <TextBlock Text="TCP CLIENT · TCP SERVER · SERIAL · TRACE REPLAY" Classes="eyebrow" VerticalAlignment="Center" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="0,0,17,0">
+                <TextBlock Text="LOCAL PTY" Classes="eyebrow" VerticalAlignment="Center" />
+                <Ellipse Width="7" Height="7" Fill="{Binding SessionIndicatorBrush}" />
+                <TextBlock Text="{Binding SessionStatus}" FontSize="9" VerticalAlignment="Center" />
+                <Button Classes="tool" Content="RESTART PTY" Click="OnRestartPtyClicked" />
+                <TextBlock Text="{Binding Terminal2TrafficLogStatus}" FontSize="8" VerticalAlignment="Center" MaxWidth="190"
+                           TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Terminal2TrafficLogStatus}" />
+                <Button Classes="tool" Content="{Binding Terminal2TrafficLogButtonText}"
+                        Command="{Binding ToggleTerminal2TrafficLogCommand}" IsEnabled="{Binding CanToggleTerminal2TrafficLog}"
+                        ToolTip.Tip="Use the active Terminal2 profile's logging options. #STARTLOG and #STOPLOG control the same traffic log." />
+            </StackPanel>
+        </Grid>
+
+        <views:DockWorkspaceHost x:Name="DockWorkspaceHost" Grid.Row="4" />
+
+        <Grid Grid.Row="5" ColumnDefinitions="Auto,*,Auto,Auto" Background="#090C11">
+            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="15,0,0,0">
+                <Ellipse Width="6" Height="6" Fill="{Binding TransportIndicatorBrush}" />
+                <TextBlock Text="{Binding TransportStatus}" FontSize="9" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" />
+            </StackPanel>
+            <TextBlock Grid.Column="2" Text="MODE  RAW BYTE STREAM" Classes="eyebrow" FontSize="8" VerticalAlignment="Center" Margin="0,0,18,0" />
+            <TextBlock Grid.Column="3" Text="SIGNALFORGE  ·  DESKTOP" Classes="eyebrow" FontSize="8" VerticalAlignment="Center" Margin="0,0,15,0" />
+        </Grid>
+
+        <views:CommandPaletteView x:Name="CommandPaletteOverlay"
+                                  Grid.RowSpan="6" />
+    </Grid>
+</Window>

@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 2,
+  "runId": "7c1ae123-673f-4391-b191-a6609d33d1f2",
+  "createdAtUtc": "2026-10-23T18:57:16.3920966+00:00",
+  "state": "passed",
+  "source": "Local Modbus simulator \u00B7 loopback only",
+  "endpoint": "127.0.0.1:57662",
+  "transportName": "TCP \u00B7 127.0.0.1:57662",
+  "startedAtUtc": "2026-10-23T18:55:24.1428509+00:00",
+  "completedAtUtc": "2026-10-23T18:55:24.1592328+00:00",
+  "scenario": {
+    "name": "Protocol test",
+    "disconnectWhenDone": true,
+    "steps": [
+      {
+        "number": 1,
+        "kind": "sendBytes",
+        "name": "Read registers 0\u20131",
+        "bytesBase64": "AAEAAAAGAQMAAAAC"
+      },
+      {
+        "number": 2,
+        "kind": "expectModbusTcp",
+        "name": "Check response",
+        "timeoutMilliseconds": 1000,
+        "transactionId": 1,
+        "unitId": 1,
+        "functionCode": 3
+      }
+    ]
+  },
+  "stepResults": [
+    {
+      "stepNumber": 1,
+      "name": "Read registers 0\u20131",
+      "passed": true,
+      "detail": "Sent 12 bytes.",
+      "expectedBytesBase64": "AAEAAAAGAQMAAAAC",
+      "observedBytesBase64": "AAEAAAAGAQMAAAAC",
+      "startedAfterMilliseconds": 9.4203,
+      "completedAfterMilliseconds": 10.0553
+    },
+    {
+      "stepNumber": 2,
+      "name": "Check response",
+      "passed": true,
+      "detail": "Received a Modbus TCP response matching all configured assertions.",
+      "expectedBytesBase64": "",
+      "observedBytesBase64": "AAEAAAAHAQMEEjS\u002B7w==",
+      "startedAfterMilliseconds": 10.0956,
+      "completedAfterMilliseconds": 14.995
+    }
+  ],
+  "evidence": [
+    {
+      "evidenceNumber": 1,
+      "stepNumber": 1,
+      "stepName": "Read registers 0\u20131",
+      "direction": "tx",
+      "elapsedMilliseconds": 10.0057,
+      "byteCount": 12,
+      "bytesBase64": "AAEAAAAGAQMAAAAC",
+      "hex": "000100000006010300000002",
+      "detail": "Sent bytes.",
+      "timeline": {
+        "source": "TEST #1",
+        "eventSequence": 1
+      }
+    },
+    {
+      "evidenceNumber": 2,
+      "stepNumber": 2,
+      "stepName": "Check response",
+      "direction": "rx",
+      "elapsedMilliseconds": 13.7697,
+      "byteCount": 13,
+      "bytesBase64": "AAEAAAAHAQMEEjS\u002B7w==",
+      "hex": "0001000000070103041234BEEF",
+      "detail": "Received transport chunk.",
+      "timeline": {
+        "source": "TEST #1",
+        "eventSequence": 2
+      }
+    }
+  ],
+  "sourceConfiguration": {
+    "kind": "modbusTcpLoopback",
+    "unitId": 1,
+    "faults": [],
+    "initialDeviceState": {
+      "unitId": 1,
+      "coils": {},
+      "discreteInputs": {},
+      "holdingRegisters": {
+        "0": 4660,
+        "1": 48879
+      },
+      "inputRegisters": {
+        "0": 42
+      }
+    }
+  }
+}

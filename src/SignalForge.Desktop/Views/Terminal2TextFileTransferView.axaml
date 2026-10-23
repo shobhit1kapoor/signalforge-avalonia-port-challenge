@@ -1,0 +1,69 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:SignalForge.Desktop.ViewModels"
+             x:Class="SignalForge.Desktop.Views.Terminal2TextFileTransferView"
+             x:DataType="vm:Terminal2TextFileTransferViewModel">
+    <Grid RowDefinitions="38,*" Background="{StaticResource CanvasBrush}">
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Background="#0E131A">
+            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="15,0,0,0">
+                <TextBlock Text="⇧" FontSize="14" Foreground="{StaticResource AccentBrush}" />
+                <TextBlock Text="TERMINAL2 TEXT-FILE SENDER" Classes="eyebrow" Foreground="{StaticResource TextMutedBrush}" />
+                <TextBlock Text="/" Classes="muted" />
+                <TextBlock Text="{Binding ProgressText}" FontSize="10" Foreground="{StaticResource TextPrimaryBrush}" />
+            </StackPanel>
+            <TextBlock Grid.Column="1" Text="CONNECTED TRANSPORT · RECORDED IN SESSION TRACE" Classes="eyebrow" FontSize="8" VerticalAlignment="Center" Margin="0,0,13,0" />
+        </Grid>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel MaxWidth="760" HorizontalAlignment="Left" Margin="24" Spacing="16">
+                <StackPanel Spacing="7">
+                    <TextBlock Text="SEND A TEXT FILE LINE BY LINE" Classes="title" />
+                    <TextBlock Text="Matches Terminal2’s text-file sender behavior: empty lines are skipped, $HH escapes become bytes, and $$ becomes a literal dollar. Every write uses the active byte session and appears in its trace." FontSize="10" TextWrapping="Wrap" />
+                </StackPanel>
+
+                <Border Background="#10161E" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="7" Padding="16">
+                    <StackPanel Spacing="13">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="TEXT FILE PATH" Classes="eyebrow" FontSize="8" />
+                            <TextBox Text="{Binding FilePath}" PlaceholderText="C:\path\to\commands.txt" MinHeight="32" />
+                        </StackPanel>
+
+                        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="14">
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="LINE ENDING" Classes="eyebrow" FontSize="8" />
+                                <CheckBox Content="Append CR (0D)" IsChecked="{Binding SendCr}" />
+                                <CheckBox Content="Append LF (0A)" IsChecked="{Binding SendLf}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Spacing="5">
+                                <TextBlock Text="INTER-LINE DELAY" Classes="eyebrow" FontSize="8" />
+                                <TextBox Text="{Binding InterLineDelayMs}" PlaceholderText="0" MinHeight="30" />
+                                <TextBlock Text="milliseconds · 0–10000" FontSize="8" Classes="muted" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="5">
+                                <TextBlock Text="PROGRESS" Classes="eyebrow" FontSize="8" />
+                                <TextBlock Text="{Binding ProgressText}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}" Margin="0,6,0,0" />
+                            </StackPanel>
+                        </Grid>
+
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <Button Classes="primary" Content="START TRANSFER" Command="{Binding StartCommand}" />
+                            <Button Classes="tool" Content="PAUSE" Command="{Binding PauseCommand}" />
+                            <Button Classes="tool" Content="RESUME" Command="{Binding ResumeCommand}" />
+                            <Button Classes="tool" Content="CANCEL" Command="{Binding CancelCommand}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="#10161E" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="7" Padding="15">
+                    <StackPanel Spacing="7">
+                        <TextBlock Text="TRANSFER STATUS" Classes="eyebrow" FontSize="8" />
+                        <ProgressBar Minimum="0" Maximum="{Binding ProgressMaximum}" Value="{Binding CompletedLines}" Height="6" />
+                        <TextBlock Text="{Binding Status}" FontSize="10" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
+                    </StackPanel>
+                </Border>
+
+                <TextBlock Text="The transfer pauses between lines. Disconnect cancels and waits for the current send to finish before the session and trace are closed." FontSize="9" Classes="muted" TextWrapping="Wrap" />
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

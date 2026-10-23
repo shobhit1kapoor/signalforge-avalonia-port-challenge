@@ -1,0 +1,32 @@
+# Verification record · 2026-10-23
+
+## Builds and runtime checks
+
+| Target | Environment | Restore/build/tests | Published app launch | Result |
+|---|---|---|---|---|
+| Windows x64 | Windows 10.0.26300, .NET SDK 10.0.302 | Locked restore passed. Final-source Release solution build: 0 warnings, 0 errors. The CI-equivalent split passed: 260 tests excluding `Terminal2SendWorkflowViewModelTests`, then that workflow test separately (261 total). | Fresh self-contained `win-x64` archive extracted and remained running through the 12-second smoke window. | Local build, split suite and archive startup smoke pass; combined invocation limitation recorded |
+| Linux x64 | Ubuntu 26.04 LTS, x86_64 under WSL2, .NET SDK 10.0.302 | Locked restore and final-source Release solution build passed with 0 warnings and 0 errors. The CI-equivalent split passed: 260 tests excluding `Terminal2SendWorkflowViewModelTests`, then that workflow test separately (261 total). | Fresh self-contained `linux-x64` archive extracted and remained running for 12 seconds under `xvfb-run`. | Split suite and archive startup smoke pass in WSL2; combined invocation limitation recorded |
+| macOS ARM64 | Cross-published from Windows with .NET SDK 10.0.302 | Fresh self-contained `osx-arm64` publish succeeded from the final source; extracted binary is Mach-O arm64. | Not launched on macOS. | Cross-publish only; native run pending |
+
+The lock files contain the declared `win-x64`, `linux-x64`, and `osx-arm64` runtime targets. CI performs a locked restore without overriding the project RID set, then publishes each matrix RID from the resolved assets. Its test step runs the 260-test suite with the dispatcher workflow excluded, then runs that one workflow in a separate invocation; both commands request a 3-minute VSTest hang diagnostic. The combined Windows invocation exceeded the VSTest inactivity limit in an earlier run, and the combined Linux invocation fails on dispatcher thread ownership. The split is the validated procedure on both systems. No GitHub-hosted CI run has been made because this checkout has no configured remote. WSL2 startup evidence is not bare-metal Linux evidence. Startup smoke verifies that the process stays open; it does not exercise every interactive feature. The macOS output is cross-published only. Regression coverage includes real socket EOF on simulator disconnect; failure of send-only scenarios when their receive pump fails before send completion; active-profile recovery with a corrupt unused Default profile; malformed Modbus TCP PDU and protocol-ID validation; LRC validation across fragmented RX chunks; cross-direction replay ordering; bounded traffic-log rotation; and loopback macro and toolbar workflows with exact transmitted bytes and logging. Filter-macro tests confirm that a completed live RX line triggers only its first matching filter's exact-title macro, handles fragmented CRLF, never triggers from historical trace projection, and reports overflow when the 64-trigger queue fills before disconnect cancels pending work. Hotkey tests verify all four modifier rows, bank offsets, invalid combinations, exact loopback output from Bank 2 Shift+F12, and that selecting an empty slot clears the runnable macro selection. The dispatcher workflow also verifies exact filter-triggered TX bytes. The decoder rebuild surfaces background exceptions in affected rows. The earlier Windows UI inspection checked the dock workspace at 1920×1080 and observed a PowerShell prompt and `Write-Output SIGNALFORGE_PTY_OK` output in the local shell tab. The rendered Avalonia buttons and live key presses have not been manually exercised. The Protocol Testing UI inspection verified the local Modbus example and a controlled function-code corruption. Both exported reports retain exact bytes and trace references as [`modbus-register-read-pass.json`](modbus-register-read-pass.json) and [`modbus-register-read-fail.json`](modbus-register-read-fail.json). Selecting a recent activity row in Device Explorer was checked to select the same assertion in Stream Inspector; screenshots are [`signalforge-live-device-explorer.jpg`](../screenshots/signalforge-live-device-explorer.jpg) and [`signalforge-modbus-fault-test.jpg`](../screenshots/signalforge-modbus-fault-test.jpg). Other captures: [`signalforge-dock-workspace.jpg`](../screenshots/signalforge-dock-workspace.jpg) and [`signalforge-pty-interactive.jpg`](../screenshots/signalforge-pty-interactive.jpg). The Protocol Studio document floated into a separate native window and RESET LAYOUT closed it; dragging a pane back and custom-layout restoration after restart remain unverified.
+
+## Local downloadable packages
+
+Final-source Windows x64, Linux x64, and macOS ARM64 archives include the README, documentation, third-party license notices, and exported protocol-test reports and are in the ignored `artifacts/` directory. Windows and Linux startup checks are recorded above; the macOS archive is cross-published only and has not been launched on a Mac. Their refreshed checksums are recorded in `artifacts/SHA256SUMS.txt` in this checkout. Downloadable public releases remain pending; tagged releases generate their own checksum manifest in CI.
+
+## Dependency review
+
+`dotnet list SignalForge.slnx package --vulnerable --include-transitive` reported no vulnerable packages from the current NuGet source on 2026-10-23.
+
+## Codec microbenchmarks
+
+Command on both systems: `dotnet run --project benchmarks/SignalForge.Benchmarks -c Release -- 250000`. Each measurement warms up, runs five samples, and reports the median. Values are environment-specific and are not a comparison between platforms.
+
+| Environment | Operation | Median throughput | Median time | Allocated per operation |
+|---|---|---:|---:|---:|
+| Windows x64 · .NET 10.0.10 | Modbus TCP decode, 12-byte request | 3,166,461 ops/s | 315.8 ns | 552.0 B |
+| Windows x64 · .NET 10.0.10 | Modbus RTU CRC, 8-byte request | 32,110,563 ops/s | 31.1 ns | 0 B |
+| Ubuntu 26.04 under WSL2 · .NET 10.0.10 | Modbus TCP decode, 12-byte request | 2,876,711 ops/s | 347.6 ns | 552.0 B |
+| Ubuntu 26.04 under WSL2 · .NET 10.0.10 | Modbus RTU CRC, 8-byte request | 36,917,806 ops/s | 27.1 ns | 0 B |
+
+All benchmark samples reported deterministic output. The benchmark covers in-process codecs only; it excludes sockets, serial hardware, trace storage, UI rendering, and end-to-end application latency. These measurements were recorded before the 2026-10-23 UI and binary-inspector additions and do not measure those features.

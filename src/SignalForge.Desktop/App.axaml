@@ -1,0 +1,123 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:SignalForge.Desktop.Views"
+             xmlns:views="using:SignalForge.Desktop.Views"
+             xmlns:dockmodel="using:Dock.Model.Mvvm.Controls"
+             xmlns:docktheme="using:Dock.Avalonia.Themes.Fluent"
+             x:Class="SignalForge.Desktop.App"
+             RequestedThemeVariant="Dark">
+    <Application.DataTemplates>
+        <DataTemplate DataType="{x:Type dockmodel:Tool}"><ContentControl Content="{Binding Context}" /></DataTemplate>
+        <DataTemplate DataType="{x:Type dockmodel:Document}"><ContentControl Content="{Binding Context}" /></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ExplorerDockPaneContext}"><views:ExplorerDockPaneView DataContext="{Binding ViewModel}" /></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:FeatureDockPaneContext}">
+            <ContentControl>
+                <views:FeatureDockPaneView DataContext="{Binding ViewModel}"
+                                           PaneContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ContentControl}}" />
+            </ContentControl>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:InspectorDockPaneContext}"><views:InspectorDockPaneView DataContext="{Binding ViewModel}" /></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:TimelineDockPaneContext}"><views:TimelineDockPaneView DataContext="{Binding ViewModel}" /></DataTemplate>
+    </Application.DataTemplates>
+
+    <Application.Resources>
+        <SolidColorBrush x:Key="CanvasBrush" Color="#0B0F14" />
+        <SolidColorBrush x:Key="SurfaceBrush" Color="#111720" />
+        <SolidColorBrush x:Key="SurfaceRaisedBrush" Color="#151D28" />
+        <SolidColorBrush x:Key="SurfaceHoverBrush" Color="#1B2633" />
+        <SolidColorBrush x:Key="LineBrush" Color="#25303D" />
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#E8EDF4" />
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="#A3AFBE" />
+        <SolidColorBrush x:Key="TextMutedBrush" Color="#748296" />
+        <SolidColorBrush x:Key="AccentBrush" Color="#56D4C8" />
+        <SolidColorBrush x:Key="AccentDimBrush" Color="#163A3C" />
+        <SolidColorBrush x:Key="WarningBrush" Color="#E3B869" />
+        <SolidColorBrush x:Key="DangerBrush" Color="#DE7979" />
+    </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme />
+        <docktheme:DockFluentTheme />
+
+        <Style Selector="Window">
+            <Setter Property="Background" Value="{StaticResource CanvasBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+            <Setter Property="FontFamily" Value="Inter" />
+        </Style>
+
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+        </Style>
+
+        <Style Selector="TextBlock.eyebrow">
+            <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}" />
+            <Setter Property="FontSize" Value="10" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+
+        <Style Selector="TextBlock.title">
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+
+        <Style Selector="TextBlock.muted">
+            <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}" />
+        </Style>
+
+        <Style Selector="TextBlock.mono">
+            <Setter Property="FontFamily" Value="Cascadia Mono, Consolas, monospace" />
+            <Setter Property="FontSize" Value="11" />
+        </Style>
+
+        <Style Selector="Button.chrome">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="9,6" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="CornerRadius" Value="5" />
+        </Style>
+        <Style Selector="Button.chrome:pointerover">
+            <Setter Property="Background" Value="{StaticResource SurfaceHoverBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        </Style>
+
+        <Style Selector="Button.tool">
+            <Setter Property="Background" Value="{StaticResource SurfaceRaisedBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource LineBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="11,7" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="CornerRadius" Value="5" />
+        </Style>
+        <Style Selector="Button.tool:pointerover">
+            <Setter Property="Background" Value="{StaticResource SurfaceHoverBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        </Style>
+        <Style Selector="Button.tool:disabled">
+            <Setter Property="Opacity" Value="0.45" />
+        </Style>
+        <Style Selector="Button.tool.selected">
+            <Setter Property="Background" Value="{StaticResource AccentDimBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+            <Setter Property="BorderBrush" Value="#2A6463" />
+        </Style>
+
+        <Style Selector="Button.primary">
+            <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+            <Setter Property="Foreground" Value="#071112" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="12,7" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="CornerRadius" Value="5" />
+        </Style>
+        <Style Selector="Button.primary:pointerover">
+            <Setter Property="Background" Value="#74E2D8" />
+        </Style>
+    </Application.Styles>
+</Application>

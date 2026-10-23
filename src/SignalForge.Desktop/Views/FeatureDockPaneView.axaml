@@ -1,0 +1,216 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:vm="using:SignalForge.Desktop.ViewModels" xmlns:rt="clr-namespace:RoyalTerminal.Avalonia.Controls;assembly=RoyalTerminal.Avalonia" xmlns:views="using:SignalForge.Desktop.Views" xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls" x:DataType="vm:MainViewModel" x:CompileBindings="False" x:Class="SignalForge.Desktop.Views.FeatureDockPaneView">
+  <TabControl x:Name="WorkspaceTabs" Background="{StaticResource CanvasBrush}" BorderThickness="0">
+    <TabItem Header="BYTE" automation:AutomationProperties.Name="Byte session workbench" FontSize="9" Padding="7,5" ToolTip.Tip="Byte session workbench · connect, capture, inspect and send raw bytes">
+      <Grid RowDefinitions="38,Auto,Auto,*,28" Background="{StaticResource CanvasBrush}">
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Background="#0E131A">
+          <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="15,0,0,0">
+            <TextBlock Text="▣" FontSize="12" Foreground="{StaticResource AccentBrush}" />
+            <TextBlock Text="RAW BYTE TRANSPORT" Classes="eyebrow" Foreground="{StaticResource TextMutedBrush}" />
+            <TextBlock Text="/" Classes="muted" />
+            <TextBlock Text="{Binding TransportStatus}" FontSize="10" Foreground="{StaticResource TextPrimaryBrush}" />
+          </StackPanel>
+          <TextBlock Grid.Column="1" Text="BYTES PRESERVED · NO TEXT DECODING" Classes="eyebrow" FontSize="8" VerticalAlignment="Center" Margin="0,0,13,0" />
+        </Grid>
+        <Border Grid.Row="1" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,1" Padding="12,9">
+          <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="1.1*,1.05*,0.55*,0.85*,0.8*,1.25*" ColumnSpacing="7" RowSpacing="5">
+            <StackPanel Grid.Row="0" Grid.Column="0" Spacing="3">
+              <TextBlock Text="TRANSPORT" Classes="eyebrow" FontSize="8" />
+              <ComboBox ItemsSource="{Binding TransportTypes}" SelectedItem="{Binding TransportType}" MinHeight="29" />
+            </StackPanel>
+            <StackPanel Grid.Row="0" Grid.Column="1" Spacing="3">
+              <TextBlock Text="TCP HOST / SERVER IP" Classes="eyebrow" FontSize="8" />
+              <TextBox Text="{Binding Host}" PlaceholderText="127.0.0.1" MinHeight="29" IsEnabled="{Binding IsTcpSelected}" />
+            </StackPanel>
+            <StackPanel Grid.Row="0" Grid.Column="2" Spacing="3">
+              <TextBlock Text="TCP PORT" Classes="eyebrow" FontSize="8" />
+              <TextBox Text="{Binding Port}" PlaceholderText="9000" MinHeight="29" IsEnabled="{Binding IsTcpSelected}" />
+            </StackPanel>
+            <StackPanel Grid.Row="0" Grid.Column="3" Spacing="3">
+              <TextBlock Text="SERIAL PORT" Classes="eyebrow" FontSize="8" />
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="4">
+                <AutoCompleteBox Grid.Column="0" Text="{Binding SerialPortName}" ItemsSource="{Binding AvailableSerialPorts}" MinimumPrefixLength="0" IsTextCompletionEnabled="False" PlaceholderText="COM3 or /dev/ttyUSB0" MinHeight="29" IsEnabled="{Binding IsSerialSelected}" />
+                <Button Grid.Column="1" Classes="tool" Content="↻" Command="{Binding RefreshSerialPortsCommand}" ToolTip.Tip="Refresh detected serial ports; manual names remain accepted." />
+              </Grid>
+              <TextBlock Text="{Binding SerialPortEnumerationStatus}" FontSize="7" TextWrapping="Wrap" MaxHeight="24" />
+            </StackPanel>
+            <StackPanel Grid.Row="0" Grid.Column="4" Spacing="3">
+              <TextBlock Text="BAUD RATE" Classes="eyebrow" FontSize="8" />
+              <TextBox Text="{Binding BaudRate}" PlaceholderText="115200" MinHeight="29" IsEnabled="{Binding IsSerialSelected}" />
+            </StackPanel>
+            <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="7">
+              <Button Classes="primary" Content="CONNECT" Command="{Binding ConnectCommand}" />
+              <Button Classes="tool" Content="DISCONNECT" Command="{Binding DisconnectCommand}" />
+            </StackPanel>
+            <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Text="TCP binds the configured address. Local simulator binds loopback only." FontSize="8" VerticalAlignment="Center" TextWrapping="Wrap" />
+            <CheckBox Grid.Row="1" Grid.Column="4" Content="DTR on open" IsChecked="{Binding InitialDtr}" IsEnabled="{Binding IsSerialSelected}" FontSize="8" VerticalAlignment="Center" />
+            <CheckBox Grid.Row="1" Grid.Column="5" Content="RTS on open" IsChecked="{Binding InitialRts}" IsEnabled="{Binding CanSetInitialRts}" FontSize="8" VerticalAlignment="Center" />
+            <StackPanel Grid.Row="2" Grid.Column="0" Spacing="3" IsEnabled="{Binding IsSerialSelected}">
+              <TextBlock Text="DATA BITS" Classes="eyebrow" FontSize="8" />
+              <ComboBox ItemsSource="{Binding SerialDataBitOptions}" SelectedItem="{Binding DataBits}" MinHeight="29" />
+            </StackPanel>
+            <StackPanel Grid.Row="2" Grid.Column="1" Spacing="3" IsEnabled="{Binding IsSerialSelected}">
+              <TextBlock Text="PARITY" Classes="eyebrow" FontSize="8" />
+              <ComboBox ItemsSource="{Binding SerialParityOptions}" SelectedItem="{Binding SerialParity}" MinHeight="29" />
+            </StackPanel>
+            <StackPanel Grid.Row="2" Grid.Column="2" Spacing="3" IsEnabled="{Binding IsSerialSelected}">
+              <TextBlock Text="STOP" Classes="eyebrow" FontSize="8" />
+              <ComboBox ItemsSource="{Binding SerialStopBitOptions}" SelectedItem="{Binding SerialStopBits}" MinHeight="29" />
+            </StackPanel>
+            <StackPanel Grid.Row="2" Grid.Column="3" Spacing="3" IsEnabled="{Binding IsSerialSelected}">
+              <TextBlock Text="HANDSHAKE" Classes="eyebrow" FontSize="8" />
+              <ComboBox ItemsSource="{Binding SerialHandshakeOptions}" SelectedItem="{Binding SerialHandshake}" MinHeight="29" />
+            </StackPanel>
+            <StackPanel Grid.Row="2" Grid.Column="4" Grid.ColumnSpan="2" Spacing="3" IsEnabled="{Binding CanConfigureSimulator}">
+              <TextBlock Text="SIMULATOR FAULT PLAN · LOOPBACK ONLY" Classes="eyebrow" FontSize="8" />
+              <ComboBox ItemsSource="{Binding SimulatorFaultPlans}" SelectedItem="{Binding SimulatorFaultPlan}" MinHeight="29" />
+            </StackPanel>
+          </Grid>
+        </Border>
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto" Background="{StaticResource SurfaceBrush}" Margin="12,8">
+          <StackPanel Grid.Column="0" Spacing="4">
+            <TextBlock Text="SEND RAW HEX" Classes="eyebrow" FontSize="8" />
+            <TextBox Text="{Binding SendHex}" PlaceholderText="01 A0 FF  ·  spaces, commas, colons accepted" FontFamily="Cascadia Mono" MinHeight="31" />
+          </StackPanel>
+          <Button Grid.Column="1" Classes="primary" Content="SEND BYTES" Command="{Binding SendHexCommand}" VerticalAlignment="Bottom" Margin="8,0,0,0" />
+          <Button Grid.Column="2" Classes="tool" Content="READ HR 0–1" Command="{Binding SendModbusReadExampleCommand}" IsEnabled="{Binding CanSendModbusExample}" VerticalAlignment="Bottom" Margin="7,0,0,0" ToolTip.Tip="Send a Modbus read holding registers 0 and 1 request through the active TCP or serial byte session." />
+        </Grid>
+        <Border Grid.Row="3" Background="#090C11" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0" Padding="18">
+          <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10" MaxWidth="400">
+            <Border Width="42" Height="42" CornerRadius="10" Background="#17222D" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" HorizontalAlignment="Center">
+              <TextBlock Text="↔" FontSize="20" Foreground="{StaticResource AccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <TextBlock Text="Byte session ready" Classes="title" HorizontalAlignment="Center" />
+            <TextBlock Text="Connect a real TCP or serial endpoint to capture RX/TX bytes. Every byte session is recorded to a JSONL trace; the timeline and inspector show captured or loaded trace data only." FontSize="10" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" />
+            <TextBlock Text="{Binding OperationMessage}" FontSize="9" Foreground="{StaticResource AccentBrush}" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" />
+          </StackPanel>
+        </Border>
+        <Grid Grid.Row="4" ColumnDefinitions="*,Auto,Auto" Background="{StaticResource SurfaceBrush}">
+          <TextBlock Grid.Column="0" Text="{Binding TransportDetail}" FontSize="9" VerticalAlignment="Center" Margin="13,0" />
+          <TextBlock Grid.Column="1" Text="{Binding RecordingTracePath}" Classes="mono" FontSize="8" VerticalAlignment="Center" MaxWidth="180" Margin="4,0,12,0" ToolTip.Tip="Output path for the current session trace." />
+          <TextBlock Grid.Column="2" Text="{Binding TransportStatus}" Classes="eyebrow" FontSize="8" VerticalAlignment="Center" Margin="0,0,13,0" />
+        </Grid>
+      </Grid>
+    </TabItem>
+    <TabItem Header="TEST" automation:AutomationProperties.Name="Protocol testing" FontSize="9" Padding="7,5" ToolTip.Tip="Protocol testing · run scripted send/expect/assert scenarios">
+      <views:ProtocolTestingView DataContext="{Binding ProtocolTesting}" />
+    </TabItem>
+    <TabItem Header="SCHEMA" automation:AutomationProperties.Name="User schema studio" FontSize="9" Padding="7,5" ToolTip.Tip="User schema studio · decode configured byte fields">
+      <views:ProtocolSchemaView DataContext="{Binding ProtocolSchema}" />
+    </TabItem>
+    <TabItem Header="TRACE DIFF" automation:AutomationProperties.Name="Trace comparison" FontSize="9" Padding="7,5" ToolTip.Tip="Trace comparison · align and inspect paired trace events">
+      <views:TraceComparisonView DataContext="{Binding TraceComparison}" />
+    </TabItem>
+    <TabItem Header="MACROS" automation:AutomationProperties.Name="Terminal2 macro editor" FontSize="9" Padding="7,5" ToolTip.Tip="Terminal2 macro editor">
+      <views:Terminal2MacroEditorView DataContext="{Binding}" />
+    </TabItem>
+    <TabItem Header="T2 SEND" automation:AutomationProperties.Name="Terminal2 send and profile compatibility" FontSize="9" Padding="7,5" ToolTip.Tip="Terminal2 migration · profile compatibility, text send and macros">
+      <Grid RowDefinitions="38,*" Background="{StaticResource CanvasBrush}">
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Background="#0E131A">
+          <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="15,0,0,0">
+            <TextBlock Text="↻" FontSize="13" Foreground="{StaticResource AccentBrush}" />
+            <TextBlock Text="TERMINAL2 PROFILE COMPATIBILITY" Classes="eyebrow" Foreground="{StaticResource TextMutedBrush}" />
+            <TextBlock Text="/" Classes="muted" />
+            <TextBlock Text="{Binding Terminal2ProfileName}" FontSize="10" Foreground="{StaticResource TextPrimaryBrush}" />
+          </StackPanel>
+          <TextBlock Grid.Column="1" Text="{Binding Terminal2ConnectionStatus}" Classes="eyebrow" FontSize="8" VerticalAlignment="Center" Margin="0,0,13,0" TextWrapping="Wrap" MaxWidth="430" />
+        </Grid>
+        <Grid Grid.Row="1" ColumnDefinitions="1.05*,0.95*" ColumnSpacing="1" Background="{StaticResource LineBrush}">
+          <Border Grid.Column="0" Background="{StaticResource CanvasBrush}" Padding="14">
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto" RowSpacing="7">
+              <TextBlock Grid.Row="0" Text="PROFILE IMPORT / EXPORT" Classes="eyebrow" Foreground="{StaticResource TextSecondaryBrush}" />
+              <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="7">
+                <TextBox Grid.Column="0" Text="{Binding Terminal2ImportPath}" PlaceholderText="Path to a Terminal2 .profile or .tmf file" MinHeight="31" />
+                <Button Grid.Column="1" Classes="tool" Content="IMPORT" Command="{Binding ImportTerminal2ProfileCommand}" />
+              </Grid>
+              <TextBlock Grid.Row="2" Text="{Binding Terminal2ProfileStatus}" FontSize="9" Foreground="{StaticResource AccentBrush}" TextWrapping="Wrap" />
+              <Grid Grid.Row="3" ColumnDefinitions="*,Auto" ColumnSpacing="7">
+                <TextBox Grid.Column="0" Text="{Binding Terminal2ExportPath}" PlaceholderText="Export path ending in .profile" MinHeight="31" />
+                <Button Grid.Column="1" Classes="tool" Content="EXPORT" Command="{Binding ExportTerminal2ProfileCommand}" />
+              </Grid>
+              <Grid Grid.Row="4" RowDefinitions="Auto,*" RowSpacing="5">
+                <TextBlock Grid.Row="0" Text="MACRO SLOTS · POPULATED SLOTS ONLY" Classes="eyebrow" FontSize="8" />
+                <ListBox Grid.Row="1" ItemsSource="{Binding Terminal2Macros}" SelectedItem="{Binding SelectedTerminal2Macro}" Background="#0D1218" BorderBrush="{StaticResource LineBrush}" BorderThickness="1">
+                  <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:Terminal2MacroSlot">
+                      <Grid RowDefinitions="Auto,Auto" Margin="8,5">
+                        <TextBlock Grid.Row="0" Text="{Binding SlotLabel}" FontSize="9" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+                        <TextBlock Grid.Row="1" Text="{Binding Summary}" FontSize="8" Classes="mono" TextTrimming="CharacterEllipsis" />
+                      </Grid>
+                    </DataTemplate>
+                  </ListBox.ItemTemplate>
+                </ListBox>
+              </Grid>
+              <TextBox Grid.Row="5" Text="{Binding Terminal2DiagnosticsText}" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" FontSize="8" Height="62" VerticalContentAlignment="Top" Background="#0D1218" BorderBrush="{StaticResource LineBrush}" />
+            </Grid>
+          </Border>
+          <Border Grid.Column="1" Background="{StaticResource CanvasBrush}" Padding="14">
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto" RowSpacing="7">
+              <TextBlock Grid.Row="0" Text="LEGACY SEND TEXT" Classes="eyebrow" Foreground="{StaticResource TextSecondaryBrush}" />
+              <TextBlock Grid.Row="1" Text="{Binding Terminal2SendSettings}" FontSize="8" />
+              <Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="7">
+                <TextBox x:Name="Terminal2SendTextBox" Grid.Column="0" Text="{Binding Terminal2SendText, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Text, $HH byte escapes, or $$ for a literal dollar" MinHeight="31" />
+                <Button Grid.Column="1" Classes="primary" Content="SEND TEXT" Command="{Binding SendTerminal2TextCommand}" />
+                <Button Grid.Column="2" Classes="tool" Content="STX/ETX" Command="{Binding SendTerminal2StxEtxCommand}" IsEnabled="{Binding CanSendTerminal2StxEtx}" ToolTip.Tip="Frame the parsed editor payload with Terminal2 STX/ETX/DLE/LRC, then append profile CR/LF outside the frame. Uses the active traced byte session." />
+              </Grid>
+              <Grid Grid.Row="3" RowDefinitions="Auto,Auto" RowSpacing="3">
+                <Grid Grid.Row="0" ColumnDefinitions="Auto,*" ColumnSpacing="6">
+                  <CheckBox Grid.Column="0" Content="Send as you type" IsChecked="{Binding Terminal2SendAsYouType}" IsEnabled="{Binding HasTerminal2Profile}" FontSize="8" VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="1" Text="{Binding Terminal2SendAsYouTypeStatus}" FontSize="8" Foreground="{StaticResource WarningBrush}" TextWrapping="Wrap" VerticalAlignment="Center" />
+                </Grid>
+                <TextBlock Grid.Row="1" Text="{Binding Terminal2TextStatus}" FontSize="8" Foreground="{StaticResource AccentBrush}" TextWrapping="Wrap" />
+              </Grid>
+              <Grid Grid.Row="4" ColumnDefinitions="Auto,Auto,*" ColumnSpacing="7">
+                <Button Classes="tool" Content="RUN SELECTED MACRO" Command="{Binding RunTerminal2MacroCommand}" />
+                <Button Grid.Column="1" Classes="tool" Content="CANCEL" Command="{Binding CancelTerminal2MacroCommand}" />
+                <TextBlock Grid.Column="2" Text="{Binding Terminal2MacroStatus}" FontSize="8" VerticalAlignment="Center" TextWrapping="Wrap" />
+              </Grid>
+              <ListBox Grid.Row="5" ItemsSource="{Binding Terminal2EffectMessages}" Background="#0D1218" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" />
+              <TextBlock Grid.Row="6" Text="Macro directives with unsupported UI or transport effects are reported here. Serial DTR, RTS, and BREAK require an active serial session." FontSize="8" TextWrapping="Wrap" />
+            </Grid>
+          </Border>
+        </Grid>
+      </Grid>
+    </TabItem>
+    <TabItem Header="FILTERS" automation:AutomationProperties.Name="Terminal2 receive filters" FontSize="9" Padding="7,5" ToolTip.Tip="Terminal2 receive filters">
+      <views:Terminal2FiltersView DataContext="{Binding Terminal2Filters}" />
+    </TabItem>
+    <TabItem Header="LIBRARY" automation:AutomationProperties.Name="Terminal2 profile library" FontSize="9" Padding="7,5" ToolTip.Tip="Terminal2 profile library">
+      <views:Terminal2ProfileLibraryView DataContext="{Binding Terminal2ProfileLibrary}" />
+    </TabItem>
+    <TabItem Header="PTY" automation:AutomationProperties.Name="Local shell terminal" FontSize="9" Padding="7,5" ToolTip.Tip="Local shell terminal · operating system shell over a pseudo-terminal">
+      <Grid RowDefinitions="38,*,28" Background="{StaticResource CanvasBrush}">
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Background="#0E131A">
+          <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="15,0,0,0">
+            <TextBlock Text="$" FontFamily="Cascadia Mono" FontSize="13" Foreground="{StaticResource AccentBrush}" />
+            <TextBlock Text="ROYALTERMINAL LOCAL PTY" Classes="eyebrow" Foreground="{StaticResource TextMutedBrush}" />
+            <TextBlock Text="/" Classes="muted" />
+            <TextBlock Text="{Binding SessionStatus}" FontSize="10" Foreground="{StaticResource TextPrimaryBrush}" />
+          </StackPanel>
+          <TextBlock Grid.Column="1" Text="LOCAL PROCESS · SEPARATE FROM BYTE TRANSPORT" Classes="eyebrow" FontSize="8" VerticalAlignment="Center" Margin="0,0,13,0" />
+        </Grid>
+        <Border Grid.Row="1" Background="#090C11" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0" Padding="11,9">
+          <rt:TerminalControl x:Name="LocalTerminal" Columns="100" Rows="27" ScrollbackLimit="10000" TerminalFontSize="13" DefaultForeground="#D8E1EA" DefaultBackground="#090C11" />
+        </Border>
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Background="{StaticResource SurfaceBrush}">
+          <TextBlock Grid.Column="0" Text="{Binding SessionNotice}" FontSize="9" VerticalAlignment="Center" Margin="13,0" />
+          <TextBlock Grid.Column="1" Text="{Binding SessionStatus}" Classes="eyebrow" FontSize="8" VerticalAlignment="Center" Margin="0,0,13,0" />
+        </Grid>
+      </Grid>
+    </TabItem>
+    <TabItem Header="FILE TX" automation:AutomationProperties.Name="Terminal2 file transfer" FontSize="9" Padding="7,5" ToolTip.Tip="Terminal2 text file transfer">
+      <views:Terminal2TextFileTransferView DataContext="{Binding Terminal2FileTransfer}" />
+    </TabItem>
+    <TabItem Header="XMODEM" automation:AutomationProperties.Name="XMODEM file transfer" FontSize="9" Padding="7,5" ToolTip.Tip="XMODEM file transfer">
+      <views:Terminal2XModemView DataContext="{Binding Terminal2XModem}" />
+    </TabItem>
+    <TabItem Header="BINARY" automation:AutomationProperties.Name="Binary inspection tools" FontSize="9" Padding="7,5" ToolTip.Tip="Binary inspection and editing tools">
+      <views:BinaryInspectorToolsView DataContext="{Binding BinaryInspectorTools}" />
+    </TabItem>
+    <TabItem Header="REMOTE" automation:AutomationProperties.Name="Remote shell terminal" FontSize="9" Padding="7,5" ToolTip.Tip="Remote shell · SSH and Telnet">
+      <views:RemoteTerminalView x:Name="RemoteTerminal" />
+    </TabItem>
+    <TabItem Header="RX LINES" automation:AutomationProperties.Name="Terminal2 receive line history" FontSize="9" Padding="7,5" ToolTip.Tip="Terminal2 completed receive-line history">
+      <views:Terminal2ReceiveHistoryView DataContext="{Binding Terminal2ReceiveHistory}" />
+    </TabItem>
+  </TabControl>
+</UserControl>

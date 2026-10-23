@@ -1,0 +1,92 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:SignalForge.Desktop.ViewModels"
+             x:Class="SignalForge.Desktop.Views.Terminal2MacroEditorView"
+             x:DataType="vm:MainViewModel">
+    <Grid RowDefinitions="Auto,*" Margin="12" RowSpacing="8" Background="{StaticResource CanvasBrush}">
+        <Border Background="#0E131A" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1" Padding="12,9">
+            <StackPanel Spacing="3">
+                <TextBlock Text="TERMINAL2 MACRO BANKS" Classes="eyebrow" Foreground="{StaticResource AccentBrush}" />
+                <TextBlock Text="Edit all 192 imported macro slots across four banks. F1–F12 run the matching hotkey row in the selected bank when a byte session is connected." FontSize="9" TextWrapping="Wrap" />
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="1" ColumnDefinitions="0.75*,1.25*" ColumnSpacing="9">
+            <Border Grid.Column="0" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="5" Padding="8">
+                <Grid RowDefinitions="Auto,*" RowSpacing="6">
+                    <TextBlock Text="BANK / SLOT · EMPTY SLOTS INCLUDED" Classes="eyebrow" FontSize="8" />
+                    <ListBox Grid.Row="1" ItemsSource="{Binding Terminal2MacroEditorSlots}" SelectedItem="{Binding SelectedTerminal2MacroEditorSlot}" Background="#0D1218" BorderBrush="{StaticResource LineBrush}" BorderThickness="1">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="vm:Terminal2MacroSlot">
+                                <StackPanel Spacing="2" Margin="6,4">
+                                    <TextBlock Text="{Binding BankAndSlotLabel}" FontSize="8" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" />
+                                    <TextBlock Text="{Binding Title}" FontSize="9" Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{Binding Summary}" Classes="mono" FontSize="8" TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="1" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="5" Padding="12">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Spacing="9">
+                        <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="8">
+                            <TextBlock Text="MACRO SLOT EDITOR" Classes="eyebrow" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1" Text="{Binding SelectedTerminal2MacroEditorSlot.BankAndSlotLabel}" Classes="mono" FontSize="9" Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center" />
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right">
+                                <TextBlock Text="HOTKEY BANK" Classes="eyebrow" FontSize="7" VerticalAlignment="Center" />
+                                <ComboBox ItemsSource="{Binding Terminal2MacroBanks}" SelectedItem="{Binding Terminal2MacroHotkeyBank}" MinHeight="28" />
+                            </StackPanel>
+                        </Grid>
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="TITLE" Classes="eyebrow" FontSize="8" />
+                            <TextBox Text="{Binding Terminal2MacroTitleEdit}" PlaceholderText="Optional macro title" MinHeight="30" IsEnabled="{Binding CanEditTerminal2Macro}" />
+                        </StackPanel>
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="COMMAND TEXT · USE {0D} / {0A} FOR LINE BREAKS" Classes="eyebrow" FontSize="8" />
+                            <TextBox Text="{Binding Terminal2MacroTextEdit}" PlaceholderText="For example: AT$0D" FontFamily="Cascadia Mono" MinHeight="54" IsEnabled="{Binding CanEditTerminal2Macro}" />
+                        </StackPanel>
+                        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="7">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="CHARACTER DELAY · MS" Classes="eyebrow" FontSize="7" />
+                                <TextBox Text="{Binding Terminal2MacroDelayBetweenCharacters}" MinHeight="29" IsEnabled="{Binding CanEditTerminal2Macro}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Spacing="4">
+                                <TextBlock Text="LINE DELAY · MS" Classes="eyebrow" FontSize="7" />
+                                <TextBox Text="{Binding Terminal2MacroDelayBetweenLinesMs}" MinHeight="29" IsEnabled="{Binding CanEditTerminal2Macro}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="4">
+                                <TextBlock Text="REPEAT INTERVAL · MS" Classes="eyebrow" FontSize="7" />
+                                <TextBox Text="{Binding Terminal2MacroRepeatEveryMs}" MinHeight="29" IsEnabled="{Binding CanEditTerminal2Macro}" />
+                            </StackPanel>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="7">
+                            <CheckBox Content="Repeat enabled" IsChecked="{Binding Terminal2MacroRepeatEnabled}" IsEnabled="{Binding CanEditTerminal2Macro}" VerticalAlignment="Center" />
+                            <StackPanel Grid.Column="1" Spacing="4">
+                                <TextBlock Text="ADDITIONAL REPEATS · 0 = NO LIMIT" Classes="eyebrow" FontSize="7" />
+                                <TextBox Text="{Binding Terminal2MacroStopAfterRepeats}" MinHeight="29" IsEnabled="{Binding CanEditTerminal2Macro}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="4">
+                                <TextBlock Text="LINE ENDING" Classes="eyebrow" FontSize="7" />
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <CheckBox Content="CR" IsChecked="{Binding Terminal2MacroAddCr}" IsEnabled="{Binding CanEditTerminal2Macro}" />
+                                    <CheckBox Content="LF" IsChecked="{Binding Terminal2MacroAddLf}" IsEnabled="{Binding CanEditTerminal2Macro}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <Button Classes="primary" Content="APPLY TO PROFILE" Command="{Binding ApplyTerminal2MacroEditsCommand}" IsEnabled="{Binding CanEditTerminal2Macro}" />
+                            <Button Classes="tool" Content="RUN SELECTED" Command="{Binding RunTerminal2MacroCommand}" IsEnabled="{Binding CanRunTerminal2Macro}" />
+                            <Button Classes="tool" Content="CANCEL RUN" Command="{Binding CancelTerminal2MacroCommand}" IsEnabled="{Binding CanCancelTerminal2Macro}" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding Terminal2MacroEditorStatus}" FontSize="9" Foreground="{StaticResource AccentBrush}" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding Terminal2MacroHotkeyHint}" FontSize="8" TextWrapping="Wrap" />
+                        <TextBlock Text="Import diagnostics block editing. Saving the profile is a separate action in PROFILE LIBRARY; export a .profile from TERMINAL2 MIGRATION when needed." FontSize="8" TextWrapping="Wrap" />
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

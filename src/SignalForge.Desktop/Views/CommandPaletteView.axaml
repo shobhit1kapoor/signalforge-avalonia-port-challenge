@@ -1,0 +1,133 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:SignalForge.Desktop.ViewModels"
+             x:Class="SignalForge.Desktop.Views.CommandPaletteView"
+             x:DataType="vm:CommandPaletteViewModel">
+    <Grid IsVisible="{Binding IsOpen}"
+          Background="#B8000000"
+          HorizontalAlignment="Stretch"
+          VerticalAlignment="Stretch">
+        <Border Width="620"
+                MaxWidth="620"
+                MaxHeight="560"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Top"
+                Margin="0,82,0,0"
+                Padding="0"
+                Background="#151D28"
+                BorderBrush="#354252"
+                BorderThickness="1"
+                CornerRadius="9">
+            <Grid RowDefinitions="Auto,Auto,*,Auto">
+                <Border Padding="18,15,18,12" Background="#19222D" CornerRadius="9,9,0,0">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="COMMAND PALETTE"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Foreground="#56D4C8" />
+                        <TextBlock Text="Search available SignalForge actions"
+                                   FontSize="12"
+                                   Foreground="#A3AFBE" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Row="1"
+                        Margin="14,12,14,8"
+                        Padding="10,2"
+                        Background="#0D1218"
+                        BorderBrush="#354252"
+                        BorderThickness="1"
+                        CornerRadius="5">
+                    <TextBox x:Name="SearchBox"
+                             Text="{Binding Query, Mode=TwoWay}"
+                             PlaceholderText="Type a command, feature, or shortcut…"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             MinHeight="38"
+                             FontSize="14"
+                             Foreground="#E8EDF4"
+                             CaretBrush="#56D4C8" />
+                </Border>
+
+                <ListBox Grid.Row="2"
+                         ItemsSource="{Binding FilteredItems}"
+                         SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+                         Margin="8,0"
+                         MaxHeight="390"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         SelectionMode="Single">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:CommandPaletteItem">
+                            <Grid ColumnDefinitions="*,Auto"
+                                  RowDefinitions="Auto,Auto"
+                                  Margin="5,5"
+                                  ColumnSpacing="10"
+                                  IsEnabled="{Binding CanExecute}">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="9">
+                                    <Border Width="28"
+                                            Height="28"
+                                            CornerRadius="5"
+                                            Background="#163A3C"
+                                            VerticalAlignment="Center">
+                                        <TextBlock Text="›"
+                                                   FontSize="18"
+                                                   Foreground="#56D4C8"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                    </Border>
+                                    <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Title}"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#E8EDF4" />
+                                        <TextBlock Text="{Binding Description}"
+                                                   FontSize="10"
+                                                   Foreground="#8996A7"
+                                                   TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                </Grid>
+                                <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                    <TextBlock Text="{Binding Category}"
+                                               FontSize="9"
+                                               Foreground="#56D4C8"
+                                               HorizontalAlignment="Right" />
+                                    <Border IsVisible="{Binding HasShortcut}"
+                                            Background="#202A36"
+                                            BorderBrush="#354252"
+                                            BorderThickness="1"
+                                            CornerRadius="3"
+                                            Padding="5,2">
+                                        <TextBlock Text="{Binding Shortcut}"
+                                                   FontSize="9"
+                                                   FontFamily="Cascadia Mono, Consolas, monospace"
+                                                   Foreground="#A3AFBE" />
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <Border Grid.Row="3"
+                        Padding="14,9"
+                        Background="#111720"
+                        BorderBrush="#25303D"
+                        BorderThickness="0,1,0,0"
+                        CornerRadius="0,0,9,9">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <TextBlock Text="{Binding Status}"
+                                   FontSize="10"
+                                   Foreground="#E3B869"
+                                   TextWrapping="Wrap" />
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                            <TextBlock Text="↑ ↓ Select" FontSize="9" Foreground="#8996A7" />
+                            <TextBlock Text="↵ Run" FontSize="9" Foreground="#8996A7" />
+                            <TextBlock Text="Esc Close" FontSize="9" Foreground="#8996A7" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

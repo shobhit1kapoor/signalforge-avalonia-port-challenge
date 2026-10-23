@@ -1,0 +1,72 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:vm="using:SignalForge.Desktop.ViewModels" xmlns:rt="clr-namespace:RoyalTerminal.Avalonia.Controls;assembly=RoyalTerminal.Avalonia" xmlns:views="using:SignalForge.Desktop.Views" xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls" x:DataType="vm:MainViewModel" x:Class="SignalForge.Desktop.Views.ExplorerDockPaneView">
+  <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,1,0">
+    <Grid RowDefinitions="45,1,*,Auto">
+      <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="15,0">
+        <TextBlock Text="◈" FontSize="14" Foreground="{StaticResource AccentBrush}" />
+        <TextBlock Text="DEVICE EXPLORER" Classes="eyebrow" Foreground="{StaticResource TextSecondaryBrush}" />
+      </StackPanel>
+      <Border Grid.Row="1" Background="{StaticResource LineBrush}" />
+      <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="13,15,13,8" Spacing="10">
+          <TextBlock Text="ACTIVE BYTE SESSION" Classes="eyebrow" Margin="2,0,0,1" />
+          <Border Background="#10161E" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="7" Padding="12">
+            <StackPanel Spacing="9">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Border Width="27" Height="27" Background="#192735" CornerRadius="5">
+                  <TextBlock Text="↔" FontSize="15" Foreground="{StaticResource AccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+                <StackPanel Spacing="2" VerticalAlignment="Center">
+                  <TextBlock Text="{Binding TransportStatus}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+                  <TextBlock Text="{Binding TransportType}" FontSize="9" Classes="muted" />
+                </StackPanel>
+              </StackPanel>
+              <TextBlock Text="{Binding TransportDetail}" FontSize="9" TextWrapping="Wrap" />
+              <TextBlock Text="{Binding SimulatorStatus}" FontSize="8" TextWrapping="Wrap" IsVisible="{Binding IsSimulatorSelected}" Foreground="{StaticResource WarningBrush}" />
+            </StackPanel>
+          </Border>
+          <TextBlock Text="LOCAL SHELL" Classes="eyebrow" Margin="2,13,0,1" />
+          <Border Background="#10161E" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="7" Padding="12">
+            <StackPanel Spacing="8">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Border Width="27" Height="27" Background="#192735" CornerRadius="5">
+                  <TextBlock Text="$" FontFamily="Cascadia Mono" FontSize="15" Foreground="{StaticResource AccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+                <StackPanel Spacing="2" VerticalAlignment="Center">
+                  <TextBlock Text="RoyalTerminal PTY" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+                  <TextBlock Text="Separate local shell tab" FontSize="9" Classes="muted" />
+                </StackPanel>
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <Ellipse Width="6" Height="6" Fill="{Binding SessionIndicatorBrush}" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding SessionStatus}" FontSize="9" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+          <Grid ColumnDefinitions="*,Auto" Margin="2,13,2,0">
+            <TextBlock Text="RECENT DEVICE ACTIVITY" Classes="eyebrow" />
+            <TextBlock Grid.Column="1" Text="LIVE / TRACE" FontSize="8" FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}" />
+          </Grid>
+          <TextBlock Text="{Binding RecentTimelineStatus}" FontSize="9" TextWrapping="Wrap" Margin="2,-4,3,0" />
+          <ListBox ItemsSource="{Binding RecentTimeline}" SelectedItem="{Binding SelectedTraceRow}" Background="Transparent" BorderThickness="0" Padding="0">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:TraceEventRow">
+                <Border Background="#10161E" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Padding="9,7" Margin="0,1">
+                  <Grid ColumnDefinitions="38,*,Auto" RowDefinitions="Auto,Auto">
+                    <TextBlock Text="{Binding Direction}" FontSize="8" FontWeight="Bold" Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="{Binding Summary}" FontSize="9" Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="2" Text="{Binding Timestamp}" Classes="mono" FontSize="8" Foreground="{StaticResource TextMutedBrush}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Source}" FontSize="8" Classes="muted" Margin="0,3,0,0" />
+                    <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Event.Endpoint}" FontSize="8" Classes="muted" Margin="6,3,0,0" TextTrimming="CharacterEllipsis" />
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </StackPanel>
+      </ScrollViewer>
+      <Border Grid.Row="3" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0" Padding="14,10">
+        <TextBlock Text="Activity rows share selection with the trace timeline and byte inspector." FontSize="9" TextWrapping="Wrap" />
+      </Border>
+    </Grid>
+  </Border>
+</UserControl>

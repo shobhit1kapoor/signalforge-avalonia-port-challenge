@@ -1,0 +1,76 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:SignalForge.Desktop.ViewModels"
+             x:Class="SignalForge.Desktop.Views.Terminal2FiltersView"
+             x:DataType="vm:Terminal2FiltersViewModel">
+    <Grid RowDefinitions="42,Auto,*" Background="{StaticResource CanvasBrush}">
+        <Border Grid.Row="0" Background="#0E131A" Padding="15,0">
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="16">
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <TextBlock Text="◉" FontSize="14" Foreground="{StaticResource AccentBrush}" />
+                    <TextBlock Text="TERMINAL2 RECEIVE FILTERS" Classes="eyebrow" Foreground="{StaticResource TextMutedBrush}" />
+                </StackPanel>
+                <CheckBox Grid.Column="1" Content="IGNORE CASE" IsChecked="{Binding IgnoreCase}"
+                          VerticalAlignment="Center" FontSize="9" />
+                <TextBlock Grid.Column="2" Text="{Binding MatchCountSummary}" Classes="eyebrow"
+                           FontSize="8" VerticalAlignment="Center" Foreground="{StaticResource AccentBrush}" />
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}"
+                BorderThickness="0,0,0,1" Padding="14,9">
+            <StackPanel Spacing="4">
+                <TextBlock Text="{Binding ProfileContext}" FontSize="9" Foreground="{StaticResource TextPrimaryBrush}" />
+                <TextBlock Text="First matching enabled slot colors RX lines. A configured macro title runs automatically on a completed matching live RX line and may transmit bytes or disconnect; imported profiles can enable this behavior. Historical traces never trigger macros. With no profile loaded, edits are a session-only draft."
+                           FontSize="8" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="2" RowDefinitions="30,*" Margin="12,8">
+            <Grid ColumnDefinitions="74,112,*,150,100,100,48" ColumnSpacing="8" Margin="8,0">
+                <TextBlock Text="SLOT / ENABLE" Classes="eyebrow" FontSize="7" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="1" Text="MATCH MODE" Classes="eyebrow" FontSize="7" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="2" Text="MATCH TEXT" Classes="eyebrow" FontSize="7" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="3" Text="TRIGGER MACRO TITLE" Classes="eyebrow" FontSize="7" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="4" Text="FOREGROUND" Classes="eyebrow" FontSize="7" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="5" Text="BACKGROUND" Classes="eyebrow" FontSize="7" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="6" Text="PREVIEW" Classes="eyebrow" FontSize="7" VerticalAlignment="Center" />
+            </Grid>
+
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Slots}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:Terminal2FilterEditorSlot">
+                            <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}"
+                                    BorderThickness="1" CornerRadius="5" Padding="8" Margin="0,3">
+                                <Grid RowDefinitions="Auto,Auto" RowSpacing="4">
+                                    <Grid ColumnDefinitions="74,112,*,150,100,100,48" ColumnSpacing="8">
+                                        <CheckBox Content="{Binding SlotLabel}" IsChecked="{Binding IsEnabled}"
+                                                  VerticalAlignment="Center" FontSize="8" />
+                                        <ComboBox Grid.Column="1" ItemsSource="{Binding Modes}" SelectedItem="{Binding SelectedMode}"
+                                                  MinHeight="29" />
+                                        <TextBox Grid.Column="2" Text="{Binding Text}" PlaceholderText="Enter match text"
+                                                 MinHeight="29" />
+                                        <TextBox Grid.Column="3" Text="{Binding MacroTitle}" PlaceholderText="Exact macro title"
+                                                 MinHeight="29" />
+                                        <TextBox Grid.Column="4" Text="{Binding ForegroundHex}" PlaceholderText="#AARRGGBB"
+                                                 MinHeight="29" FontFamily="Cascadia Mono" FontSize="8" />
+                                        <TextBox Grid.Column="5" Text="{Binding BackgroundHex}" PlaceholderText="#AARRGGBB"
+                                                 MinHeight="29" FontFamily="Cascadia Mono" FontSize="8" />
+                                        <Border Grid.Column="6" Background="{Binding BackgroundPreview}" BorderBrush="{StaticResource LineBrush}"
+                                                BorderThickness="1" CornerRadius="3" MinHeight="27" VerticalAlignment="Center">
+                                            <TextBlock Text="Aa" Foreground="{Binding ForegroundPreview}" HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center" FontSize="10" FontWeight="Bold" />
+                                        </Border>
+                                    </Grid>
+                                    <TextBlock Grid.Row="1" Text="{Binding ValidationMessage}" FontSize="8"
+                                               Foreground="{StaticResource WarningBrush}" TextWrapping="Wrap" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</UserControl>

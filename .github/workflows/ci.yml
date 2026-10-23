@@ -1,0 +1,128 @@
+name: Build, verify, and package
+
+on:
+  push:
+    branches: ["**"]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: ${{ matrix.platform }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows-x64
+            os: windows-latest
+            rid: win-x64
+            archive: zip
+          - platform: linux-x64
+            os: ubuntu-latest
+            rid: linux-x64
+            archive: tar.gz
+          - platform: macos-arm64
+            os: macos-latest
+            rid: osx-arm64
+            archive: tar.gz
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pinned .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.302
+
+      - name: Restore locked dependencies
+        run: dotnet restore SignalForge.slnx --locked-mode
+
+      - name: Run automated acceptance suite
+        run: dotnet test tests/SignalForge.Core.Tests/SignalForge.Core.Tests.csproj --configuration Release --no-restore --blame-hang-timeout 3m --filter "FullyQualifiedName!~SignalForge.Core.Tests.Desktop.Terminal2SendWorkflowViewModelTests"
+
+      - name: Run Terminal2 dispatcher workflow in isolation
+        run: dotnet test tests/SignalForge.Core.Tests/SignalForge.Core.Tests.csproj --configuration Release --no-restore --blame-hang-timeout 3m --filter "FullyQualifiedName~SignalForge.Core.Tests.Desktop.Terminal2SendWorkflowViewModelTests"
+
+      - name: Install Linux virtual display
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes xvfb libx11-6 libxrandr2 libxinerama1 libxcursor1 libxi6 libfontconfig1
+
+      - name: Publish self-contained desktop app
+        run: dotnet publish src/SignalForge.Desktop/SignalForge.Desktop.csproj --configuration Release --no-restore --runtime ${{ matrix.rid }} --self-contained true --output artifacts/publish
+
+      - name: Launch smoke test (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./eng/smoke-test-windows.ps1 -ExecutablePath ./artifacts/publish/SignalForge.Desktop.exe
+
+      - name: Launch smoke test (Linux)
+        if: runner.os == 'Linux'
+        run: xvfb-run --auto-servernum bash ./eng/smoke-test-unix.sh ./artifacts/publish/SignalForge.Desktop
+
+      - name: Launch smoke test (macOS)
+        if: runner.os == 'macOS'
+        run: bash ./eng/smoke-test-unix.sh ./artifacts/publish/SignalForge.Desktop
+
+      - name: Stage package metadata (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Copy-Item README.md artifacts/publish/README.md
+          Copy-Item LICENSE artifacts/publish/LICENSE
+          Copy-Item -Recurse docs artifacts/publish/docs
+          Copy-Item -Recurse licenses artifacts/publish/licenses
+
+      - name: Stage package metadata (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          cp README.md artifacts/publish/README.md
+          cp LICENSE artifacts/publish/LICENSE
+          cp -R docs artifacts/publish/docs
+          cp -R licenses artifacts/publish/licenses
+
+      - name: Create Windows package
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: Compress-Archive -Path artifacts/publish/* -DestinationPath artifacts/SignalForge-${{ matrix.platform }}.zip
+
+      - name: Create Unix package
+        if: runner.os != 'Windows'
+        run: tar -czf artifacts/SignalForge-${{ matrix.platform }}.tar.gz -C artifacts/publish .
+
+      - name: Upload platform package
+        uses: actions/upload-artifact@v4
+        with:
+          name: SignalForge-${{ matrix.platform }}
+          path: artifacts/SignalForge-${{ matrix.platform }}.${{ matrix.archive }}
+          if-no-files-found: error
+
+  release:
+    name: Publish tagged release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download platform packages
+        uses: actions/download-artifact@v4
+        with:
+          pattern: SignalForge-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: Create SHA-256 manifest
+        working-directory: release-assets
+        run: sha256sum SignalForge-* > SHA256SUMS.txt
+
+      - name: Create GitHub release with platform packages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create "$GITHUB_REF_NAME" release-assets/* --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" --generate-notes

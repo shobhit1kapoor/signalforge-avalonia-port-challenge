@@ -1,0 +1,35 @@
+using Avalonia.Controls;
+using Avalonia.Interactivity;
+using SignalForge.Desktop.ViewModels;
+
+namespace SignalForge.Desktop.Views;
+
+public partial class ProtocolSchemaView : UserControl
+{
+    private const string ExampleSchema = """
+        {
+          "name": "Example telemetry packet",
+          "minimumLength": 8,
+          "maximumLength": 8,
+          "exactLength": 8,
+          "signatureHex": "A5 5A",
+          "signatureOffset": 0,
+          "fields": [
+            { "name": "Signature", "offset": 0, "length": 2, "type": "bytes", "byteOrder": "bigEndian" },
+            { "name": "Version", "offset": 2, "length": 1, "type": "uInt8", "byteOrder": "bigEndian" },
+            { "name": "Flags", "offset": 3, "length": 1, "type": "uInt8", "byteOrder": "bigEndian" },
+            { "name": "Reading", "offset": 4, "length": 2, "type": "uInt16", "byteOrder": "bigEndian" },
+            { "name": "Reserved", "offset": 6, "length": 2, "type": "bytes", "byteOrder": "bigEndian" }
+          ],
+          "checksum": null
+        }
+        """;
+
+    public ProtocolSchemaView() => InitializeComponent();
+
+    private void OnResetExampleClick(object? sender, RoutedEventArgs args)
+    {
+        if (DataContext is ProtocolSchemaViewModel viewModel)
+            viewModel.SchemaJson = ExampleSchema;
+    }
+}
