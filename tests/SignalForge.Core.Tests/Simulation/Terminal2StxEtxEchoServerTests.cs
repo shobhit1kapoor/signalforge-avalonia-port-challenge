@@ -17,10 +17,13 @@ public sealed class Terminal2StxEtxEchoServerTests
             InjectBadLrcOnNextResponse = true
         });
         var firstFragmentReceived = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var secondResponseSent = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         simulator.EventOccurred += (_, args) =>
         {
             if (args.Kind == Terminal2StxEtxEchoEventKind.BytesReceived && simulator.BytesReceived >= 3)
                 firstFragmentReceived.TrySetResult();
+            if (args.Kind == Terminal2StxEtxEchoEventKind.ResponseSent && args.RequestNumber == 2)
+                secondResponseSent.TrySetResult();
         };
 
         await simulator.StartAsync();
@@ -52,6 +55,7 @@ public sealed class Terminal2StxEtxEchoServerTests
         var goodValidation = Terminal2StxEtxCodec.Decode(actualGoodResponse);
         Assert.True(goodValidation.IsValid);
         Assert.Equal(secondPayload, goodValidation.Value);
+        await secondResponseSent.Task.WaitAsync(TimeSpan.FromSeconds(3));
 
         Assert.Equal(2, simulator.RequestCount);
         Assert.Equal(2, simulator.ResponseCount);
